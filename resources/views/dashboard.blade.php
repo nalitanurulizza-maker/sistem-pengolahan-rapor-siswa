@@ -1,155 +1,76 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>E-Rapor Dashboard</title>
+@extends('layout.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Dashboard')
 
-    <style>
-        body {
-            background: #f4f6f9;
-        }
+@section('content')
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background: #0f172a;
-            color: white;
-            position: fixed;
-        }
+<style>
+.welcome {
+  background:linear-gradient(45deg,#4facfe,#00f2fe);
+  color:white;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+  color:white;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
 
-        .sidebar h4 {
-            padding: 20px;
-        }
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+}
+.card {
+  padding:20px;
+  border-radius:12px;
+  color:white;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.card i { font-size:24px; }
 
-        .sidebar a {
-            display: block;
-            color: #cbd5e1;
-            padding: 12px 20px;
-            text-decoration: none;
-        }
+.card:nth-child(1){background:linear-gradient(45deg,#7b2ff7,#9b59b6);} 
+.card:nth-child(2){background:linear-gradient(45deg,#00c6ff,#0072ff);} 
+.card:nth-child(3){background:linear-gradient(45deg,#ff512f,#dd2476);} 
+.card:nth-child(4){background:linear-gradient(45deg,#36d1dc,#5b86e5);} 
+.card:nth-child(5){background:linear-gradient(45deg,#f7971e,#ffd200);} 
+.card:nth-child(6){background:linear-gradient(45deg,#c31432,#240b36);} 
+</style>
 
-        .sidebar a:hover {
-            background: #1e293b;
-            color: white;
-        }
+<div class="content">
 
-        .content {
-            margin-left: 250px;
-            padding: 30px;
-        }
-
-        .stat-card {
-            border-radius: 10px;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-
-        <h4>E-RAPOR</h4>
-
-        <a href="#">Dashboard</a>
-
-        <p class="px-3 mt-3 text-secondary">DATA INDUK</p>
-
-        <a href="#">Data Siswa</a>
-        <a href="#">Data Guru</a>
-        <a href="#">Mata Pelajaran</a>
-
-        <p class="px-3 mt-3 text-secondary">AKADEMIK</p>
-
-        <a href="#">Input Nilai</a>
-        <a href="#">Presensi</a>
-        <a href="#">Ekstrakurikuler</a>
-
-        <p class="px-3 mt-3 text-secondary">ADMIN</p>
-
-        <a href="#">Cetak Rapor</a>
-        <a href="#" class="text-danger">Logout</a>
-
+    <div class="welcome">
+        <h3>Selamat Datang di Halaman Admin</h3>
+        <p>Anda login sebagai Admin</p>
     </div>
 
-
-    <!-- Content -->
-    <div class="content">
-
-        <h4 class="mb-4">Dashboard</h4>
-
-        <div class="row mb-4">
-
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <p>Kurikulum Aktif</p>
-                    <h5>Kurikulum Merdeka</h5>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <p>Total Siswa</p>
-                    <h5>320 Siswa</h5>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <p>Input Nilai</p>
-                    <h5 class="text-success">85% Complete</h5>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <p>Status Rapor</p>
-                    <h5 class="text-warning">Siap Cetak</h5>
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Tabel Input Nilai -->
+    <div class="cards">
         <div class="card">
-
-            <div class="card-header d-flex justify-content-between">
-                <h5>Form Input Nilai</h5>
-                <button class="btn btn-primary">
-                    Simpan Semua Data
-                </button>
-            </div>
-
-            <div class="card-body">
-
-                <table class="table table-bordered">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>Siswa</th>
-                            <th>Tugas</th>
-                            <th>UTS</th>
-                            <th>UAS</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                       
-                    </tbody>
-
-                </table>
-
-            </div>
-
+            Pengguna {{ $data['pengguna'] }}
+            <i class="fa fa-users"></i>
         </div>
 
+        <div class="card">
+            Guru {{ $data['guru'] }}
+            <i class="fa fa-user-tie"></i>
+        </div>
+
+        <div class="card">
+            Siswa {{ $data['siswa'] }}
+            <i class="fa fa-user-graduate"></i>
+        </div>
+
+        <div class="card">
+            Mapel {{ $data['mapel'] }}
+            <i class="fa fa-book"></i>
+        </div>
     </div>
 
-</body>
-</html>
+</div>
+
+@endsection

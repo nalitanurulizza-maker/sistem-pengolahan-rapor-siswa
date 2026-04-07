@@ -35,4 +35,15 @@ class HomeController extends Controller
         $data = $this->getData();
         return view('home', compact('data'));
     }
+
+    // Tambahan dari branch lain:
+    public function index()
+    {
+        return view('welcome'); // Halaman awal Laravel
+    }
+
+    public function contact()
+    {
+        return "Ini halaman kontak";
+    }
 }
