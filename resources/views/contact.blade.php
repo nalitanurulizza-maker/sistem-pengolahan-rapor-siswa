@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - NotuDesk</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Contact Us - E-RAPOR</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
 
@@ -52,6 +52,13 @@
             <div class="text-center mt-4">
                 <a href="/" class="text-sm text-indigo-600 hover:text-indigo-500"> Kembali ke Beranda</a>
             </div>
+
+            <div class="mt-6 border-t pt-4">
+                <div class="bg-blue-500 p-4 m-4 rounded-lg text-white text-center">
+                    Ini pakai Tailwind
+                </div>
+            </div>
+
         </div>
     </div>
 
