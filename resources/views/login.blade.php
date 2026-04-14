@@ -1,3 +1,4 @@
+@vite(['resources/css/app.css', 'resource/js/app.js'])
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,6 +9,7 @@
 </head>
 
 <body class="bg-light">
+
 
 <div class="container text-center mt-5">
     <h2 class="fw-bold">E-RAPOR</h2>
