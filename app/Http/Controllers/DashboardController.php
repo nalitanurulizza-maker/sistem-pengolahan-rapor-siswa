@@ -8,14 +8,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // contoh data (nanti bisa dari database)
+        // Data sementara (nanti bisa ambil dari database)
         $data = [
             'pengguna' => 3,
-            'guru' => 40,
-            'siswa' => 210,
-            'mapel' => 47
+            'guru'     => 40,
+            'siswa'    => 210,
+            'mapel'    => 47
         ];
 
-        return view('dashboard', compact('data'));
+        // Pastikan view ada di: resources/views/admin/dashboard.blade.php
+        return view('admin.dashboard', compact('data'));
     }
 }
