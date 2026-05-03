@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\admin; 
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -16,7 +16,8 @@ class AdminDashboardController extends Controller
             'jumlahMapel' => 47,
         ];
 
-        // ✅ SESUAIKAN DENGAN FOLDER & NAMA FILE
+        // PERBAIKAN DI SINI:
+        // Gunakan 'admin.dashboard' jika filenya ada di resources/views/admin/dashboard.blade.php
         return view('admin.dashboard-admin', compact('rekapData'));
     }
 }
