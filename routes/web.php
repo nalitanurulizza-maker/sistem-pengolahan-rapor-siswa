@@ -20,6 +20,9 @@ Route::post('/contact', [ContactController::class, 'kirim'])->name('contact.kiri
 
 // DASHBOARD ADMIN
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
+Route::get('/admin/data-siswa', function () {
+    return view('admin.data-siswa');
+});
 
 // DASHBOARD GURU
 Route::get('/guru/dashboard', [GuruDashboardController::class, 'index'])->name('guru-dashboard');
