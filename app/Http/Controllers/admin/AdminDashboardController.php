@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DashboardController extends Controller
+class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Data sementara (nanti bisa ambil dari database)
         $data = [
             'pengguna' => 3,
             'guru'     => 40,
@@ -16,7 +16,6 @@ class DashboardController extends Controller
             'mapel'    => 47
         ];
 
-        // Pastikan view ada di: resources/views/admin/dashboard.blade.php
         return view('admin.dashboard', compact('data'));
     }
 }
