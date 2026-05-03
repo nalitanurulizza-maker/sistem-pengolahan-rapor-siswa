@@ -17,9 +17,9 @@
                 <i class="fa-solid fa-chevron-down text-xs self-center transition-transform" :class="open && 'rotate-180'"></i>
             </button>
             <div x-show="open" x-cloak class="text-sm pl-12 pb-2 bg-black/10">
-                <a href="#" class="block py-2 hover:text-cyan-300">Data Siswa</a>
-                <a href="#" class="block py-2 hover:text-cyan-300">Data Guru</a>
-                <a href="#" class="block py-2 hover:text-cyan-300">Data Wali Kelas</a>
+                <a href="{{ route('data-siswa') }}" class="block py-2 hover:text-cyan-300">Data Siswa</a>
+                <a href="{{ route('data-guru') }}" class="block py-2 hover:text-cyan-300">Data Guru</a>
+                <a href="{{ route('data-wali-kelas') }}" class="block py-2 hover:text-cyan-300">Data Wali Kelas</a>
             </div>
         </div>
 

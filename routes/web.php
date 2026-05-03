@@ -21,9 +21,28 @@ Route::post('/contact', [ContactController::class, 'kirim'])->name('contact.kiri
 
 // DASHBOARD ADMIN
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
+
+// Tambahkan ->name() agar sinkron dengan yang kamu panggil di sidebar.blade.php
 Route::get('/admin/data-siswa', function () {
     return view('admin.data-siswa');
-});
+})->name('data-siswa');
+
+Route::get('/admin/data-guru', function () {
+    return view('admin.data-guru');
+})->name('data-guru');
+
+Route::get('/admin/data-wali-kelas', function () {
+    return view('admin.data-wali-kelas');
+})->name('data-wali-kelas');
+
+// Tambahkan juga untuk bagian Akademik jika diperlukan
+Route::get('/admin/mata-pelajaran', function () {
+    return view('admin.mata-pelajaran');
+})->name('mata-pelajaran');
+
+Route::get('/admin/tahun-akademik', function () {
+    return view('admin.tahun-akademik');
+})->name('tahun-akademik');
 
 // DASHBOARD GURU
 Route::prefix('guru')->group(function () {
