@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin; // Gunakan huruf kecil sesuai folder kamu
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,7 +9,6 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Sesuaikan nama key agar sama dengan yang kamu panggil di Blade
         $rekapData = [
             'jumlahGuru'  => 40,
             'jumlahSiswa' => 210,
@@ -17,7 +16,7 @@ class AdminDashboardController extends Controller
             'jumlahMapel' => 47,
         ];
 
-        // Pastikan memanggil folder 'admin' dan file 'dashboard'
-        return view('admin-dashboard', compact('rekapData'));
+        // ✅ SESUAIKAN DENGAN FOLDER & NAMA FILE
+        return view('admin.dashboard-admin', compact('rekapData'));
     }
 }
