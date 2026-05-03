@@ -21,7 +21,7 @@
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Kelas</label>
             <div class="md:w-3/4 relative">
                 <select name="kelas" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
-                    <option value="">-- Pilih Kelas --</option>
+                    <option value="" selected disabled></option>
                     <option value="X-IPA-1">X-IPA-1</option>
                 </select>
                 <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
@@ -33,7 +33,7 @@
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Mata Pelajaran</label>
             <div class="md:w-3/4 relative">
                 <select name="mapel" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
-                    <option value="">-- Pilih Mapel --</option>
+                    <option value="" selected disabled></option>
                     <option value="matematika">Matematika</option>
                 </select>
                 <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
@@ -45,7 +45,7 @@
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Nilai</label>
             <div class="md:w-3/4 relative">
                 <select name="jenis_nilai" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
-                    <option value="">-- Pilih Nilai --</option>
+                    <option value="" selected disabled></option>
                     <option value="harian">Harian</option>
                     <option value="uts">UTS</option>
                     <option value="uas">UAS</option>
