@@ -52,5 +52,7 @@ Route::prefix('guru')->group(function () {
 
     // URL: /guru/cek-nilai
     Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('guru.cek-nilai');
-
+ 
+    // URL: /guru/input-nilai (INI YANG BARU)
+    Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('guru.input-nilai');
 });
