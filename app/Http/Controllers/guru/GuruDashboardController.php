@@ -25,4 +25,11 @@ class GuruDashboardController extends Controller
         // Pastikan file view kamu ada di resources/views/guru/cek-nilai.blade.php
         return view('guru.cek-nilai');
     }
+
+    // Halaman Input Nilai Rapor (BARU)
+    public function inputNilai()
+    {
+        // Pastikan file view kamu ada di resources/views/guru/input-nilai.blade.php
+        return view('guru.input-nilai');
+    }
 }
