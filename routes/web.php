@@ -3,29 +3,23 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\admin\AdminDashboardController;
+use App\Http\Controllers\guru\GuruDashboardController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Halaman Utama / Landing Page
-// Opsional: Jika ingin langsung ke login, gunakan LoginController
+// LANDING PAGE
 Route::get('/', [HomeController::class, 'tampilkan']);
 
-// Login System
-Route::get('/login', [LoginController::class, 'tampilkan'])->name('login');
-Route::post('/login', [LoginController::class, 'prosesLogin']);
+// LOGIN
+Route::get('/login', [LoginController::class, 'index'])->name('login');
+Route::post('/login', [LoginController::class, 'prosesLogin'])->name('login.proses');
 
-// Dashboard
-Route::get('/admin/dashboard-admin', [AdminDashboard::class, 'index'])->name('dashboard');
-
-// Home (Tambahan dari versi Incoming)
-Route::get('/home', [HomeController::class, 'tampilkan'])->name('home');
-
-// Contact System
+// CONTACT
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'kirim'])->name('contact.kirim');
+
+// DASHBOARD ADMIN
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
+
+// DASHBOARD GURU
+Route::get('/guru/dashboard', [GuruDashboardController::class, 'index'])->name('guru-dashboard');
