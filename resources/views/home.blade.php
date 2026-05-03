@@ -1,3 +1,5 @@
+@extends('layout.home') {{-- INI KUNCI AGAR TIDAK KOSONG --}}
+
 @section('title', 'e-Rapor | Sistem Manajemen Rapor Digital')
 
 @section('content')
