@@ -17,6 +17,12 @@ class GuruDashboardController extends Controller
             'jumlahMapel' => 47,
         ];
 
-        return view('dashboard.guru', compact('rekapData'));
+        return view('guru.dashboard-guru', compact('rekapData'));
+    }
+    // Halaman Cek Nilai Rapor
+    public function cekNilai()
+    {
+        // Pastikan file view kamu ada di resources/views/guru/cek-nilai.blade.php
+        return view('guru.cek-nilai');
     }
 }

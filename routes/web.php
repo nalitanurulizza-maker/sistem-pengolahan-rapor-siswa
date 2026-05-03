@@ -23,3 +23,12 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name
 
 // DASHBOARD GURU
 Route::get('/guru/dashboard', [GuruDashboardController::class, 'index'])->name('guru-dashboard');
+Route::prefix('guru')->group(function () {
+    
+    // URL: /guru/dashboard
+    Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('guru.dashboard');
+
+    // URL: /guru/cek-nilai
+    Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('guru.cek-nilai');
+
+});
