@@ -1,5 +1,3 @@
-@extends('layout.app')
-
 @section('title', 'e-Rapor | Sistem Manajemen Rapor Digital')
 
 @section('content')
