@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\ContactController;
 
 /*
@@ -21,7 +21,7 @@ Route::get('/login', [LoginController::class, 'tampilkan'])->name('login');
 Route::post('/login', [LoginController::class, 'prosesLogin']);
 
 // Dashboard
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/admin/dashboard-admin', [AdminDashboard::class, 'index'])->name('dashboard');
 
 // Home (Tambahan dari versi Incoming)
 Route::get('/home', [HomeController::class, 'tampilkan'])->name('home');
