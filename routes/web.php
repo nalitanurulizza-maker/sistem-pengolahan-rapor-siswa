@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\admin\AdminDashboardController;
 use App\Http\Controllers\guru\GuruDashboardController;
+use App\Http\Controllers\wali\WaliDashboardController;
 
 // LANDING PAGE
 Route::get('/', [HomeController::class, 'tampilkan']);
@@ -41,6 +42,4 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // DASHBOARD GURU
 Route::get('/guru/dashboard', [GuruDashboardController::class, 'index'])->name('guru-dashboard');
-Route::get('/wali/dashboard', function () {
-    return view('wali.dashboard');
-})->name('wali.dashboard');
+Route::get('/wali/dashboard', [WaliDashboardController::class, 'index'])->name('wali.dashboard');
