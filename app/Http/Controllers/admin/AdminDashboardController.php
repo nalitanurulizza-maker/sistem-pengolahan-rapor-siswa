@@ -17,6 +17,6 @@ class AdminDashboardController extends Controller
         ];
 
         // ✅ SESUAIKAN DENGAN FOLDER & NAMA FILE
-        return view('admin.dashboard-admin', compact('rekapData'));
+        return view('admin.dashboard-admin', $rekapData);
     }
 }
