@@ -55,9 +55,23 @@
     </nav>
 
     <!-- Second Section -->
-    <div class="bg-blue-50 py-16 md:py-20">
+    <div class="bg-gray-50 py-16 md:py-20">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-left">
+                    <p class="text-gray-500 text-lg mb-4">Sistem Akademik Modern</p>
+                    <h1 class="text-4xl md:text-6xl font-bold leading-tight text-gray-900">
+                        Kelola Nilai & Rapor Siswa Lebih Profesional
+                    </h1>
+                    <p class="mt-8 text-gray-600 text-lg">
+                        Platform digital terintegrasi untuk manajemen rapor sekolah.
+                    </p>
+                    <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })"
+                            class="mt-10 border-2 border-gray-800 hover:bg-gray-900 hover:text-white px-8 py-4 rounded-3xl text-lg font-medium transition w-full md:w-auto">
+                        Pelajari Lebih
+                    </button>
+                </div>
+
                 <div class="flex justify-center md:justify-start">
                     <div class="bg-white border border-blue-200 rounded-3xl px-8 py-8 text-center md:text-left shadow-sm">
                         <p class="text-2xl font-semibold mb-4 text-blue-700">Sistem E-RAPOR</p>
@@ -67,20 +81,6 @@
                             <span>● Aman</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="text-center md:text-left">
-                    <p class="text-blue-700 text-lg mb-4">Sistem Akademik Modern</p>
-                    <h1 class="text-4xl md:text-6xl font-bold leading-tight text-gray-900">
-                        Kelola Nilai & Rapor Siswa Lebih Profesional
-                    </h1>
-                    <p class="mt-8 text-gray-600 text-lg">
-                        Platform digital terintegrasi untuk manajemen rapor sekolah.
-                    </p>
-                    <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })"
-                            class="mt-10 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-800 px-8 py-4 rounded-3xl text-lg font-medium transition w-full md:w-auto">
-                        Pelajari Lebih
-                    </button>
                 </div>
             </div>
         </div>
