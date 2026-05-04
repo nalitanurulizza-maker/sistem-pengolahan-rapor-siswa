@@ -4,19 +4,6 @@
 <!-- Bungkus seluruh konten dengan x-data Alpine.js -->
 <div x-data="{ openTambah: false }">
 
-    <!-- HEADER -->
-    <div class="rounded-2xl p-4 text-white shadow-lg mb-6" style="background: linear-gradient(135deg,#1e6fdc,#00d4ff);">
-        <div class="flex justify-between items-center">
-            <div class="font-semibold">
-                E-RAPOR SMA | <span class="opacity-80">2026/2027</span>
-            </div>
-            <div class="bg-white/20 px-4 py-1 rounded-full flex items-center gap-2">
-                <i class="fa-solid fa-user"></i>
-                <span>Admin</span>
-            </div>
-        </div>
-    </div>
-
     <div class="p-6">
         <h2 class="text-xl font-bold mb-4">DATA SISWA</h2>
 
