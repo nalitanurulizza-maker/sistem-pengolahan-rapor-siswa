@@ -17,7 +17,6 @@
                             <option selected>Pilih Jenis Pengguna</option>
                             <option>Admin</option>
                             <option>Guru</option>
-                            <option>Wali Kelas</option>
                         </select>
                     </div>
 
