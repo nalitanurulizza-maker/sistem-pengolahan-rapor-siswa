@@ -38,19 +38,21 @@ body{
     top:0;
     width:100%;
     z-index:1050;
-    padding:18px 0;
+    padding:8px 0;
     transition:.4s;
 }
 
+/* Paksa navbar atas agar transparan di Gambar 1 */
 #mainNavbar.at-top{
-    background:transparent;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 #mainNavbar.scrolled{
-    background:rgba(255,255,255,.9);
+    background:rgba(255,255,255,.9) !important;
     backdrop-filter:blur(18px);
     box-shadow:0 8px 30px rgba(0,0,0,.08);
-    padding:12px 0;
+    padding:5px 0;
 }
 
 .navbar-brand-text{
@@ -61,10 +63,19 @@ body{
     -webkit-text-fill-color:transparent;
 }
 
+/* Pastikan warna teks menu mengikuti kondisi (Putih saat di atas, Gelap saat di-scroll) */
+#mainNavbar.at-top .nav-link-custom {
+    color: #1a2340  !important;
+}
+
+#mainNavbar.scrolled .nav-link-custom {
+    color: #1a2340 !important;
+}
+
 .nav-link-custom{
-    color:#1a2340 !important;
     font-weight:500;
     position:relative;
+    transition: 0.3s;
 }
 
 .nav-link-custom::after{
@@ -79,25 +90,32 @@ body{
 }
 
 .nav-link-custom:hover{
-    color:var(--primary)!important;
+    color:var(--accent)!important;
 }
 
 .nav-link-custom:hover::after{
     width:100%;
 }
 
-.btn-login-nav{
-    background:linear-gradient(135deg,#1e6fdc,#00d4ff);
-    color:#fff!important;
-    border-radius:50px;
-    padding:10px 26px!important;
-    border:none;
+.btn-login-nav {
+    background: linear-gradient(135deg, #1e6fdc, #00d4ff);
+    color: #fff !important;
+    border-radius: 50px;
+    /* Mengubah padding vertikal tombol dari 10px menjadi 8px */
+    padding: 8px 24px !important; 
+    border: none;
+    transition: 0.3s;
+}
+.btn-login-nav:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 /* ================= HERO ================= */
 #beranda{
     min-height:100vh;
-    background:linear-gradient(135deg,#0a1628 0%,#0d2856 35%,#1e6fdc 70%,#00b4d8 100%);
+    /* Memastikan gradient biru tua ke terang Gambar 1 terkunci */
+    background: linear-gradient(135deg,#0a1628 0%,#0d2856 35%,#1e6fdc 70%,#00b4d8 100%) !important;
     display:flex;
     align-items:center;
     position:relative;
@@ -109,7 +127,7 @@ body{
     content:'';
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,.2);
+    background:rgba(0,0,0,.15);
 }
 
 #beranda .container{
@@ -118,7 +136,7 @@ body{
 }
 
 .hero-title{
-    color:#fff;
+    color:#fff !important;
     font-size:clamp(2.5rem,5vw,4rem);
     font-weight:800;
 }
@@ -127,27 +145,46 @@ body{
     background:linear-gradient(135deg,#00d4ff,#c9f6ff);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
+    display: inline-block;
 }
 
 .hero-desc{
-    color:rgba(255,255,255,.75);
+    color:rgba(255,255,255,.85) !important;
     max-width:520px;
 }
 
 .btn-hero-primary{
-    background:#fff;
+    background:#fff !important;
     color:var(--primary)!important;
     border-radius:50px;
     padding:14px 30px;
     text-decoration:none;
+    display: inline-block;
+    font-weight: 600;
 }
 
 .btn-hero-outline{
-    border:1px solid rgba(255,255,255,.4);
+    border:1px solid rgba(255,255,255,.6) !important;
     color:#fff!important;
     border-radius:50px;
     padding:14px 30px;
     text-decoration:none;
+    display: inline-block;
+    background: transparent !important;
+}
+.btn-hero-outline:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Card Kanan di Hero (Sistem E-Rapor) */
+.hero-card-right {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 40px;
+    color: #fff !important;
+    text-align: center;
 }
 
 /* ================= SECTION ================= */
@@ -162,11 +199,13 @@ section{
     border-radius:50px;
     font-size:.8rem;
     font-weight:600;
+    display: inline-block;
 }
 
 .section-title{
     font-size:2.5rem;
     font-weight:800;
+    color: #1a2340;
 }
 
 .section-subtitle{
@@ -205,14 +244,21 @@ section{
 
 /* ================= KONTAK ================= */
 #kontak{
-    background:linear-gradient(160deg,#0d2856,#1e6fdc);
-    color:#fff;
+    /* Mengunci background biru tua Gambar 1 */
+    background: linear-gradient(160deg,#0d2856,#1e6fdc) !important;
+    color:#fff !important;
+}
+
+#kontak h2, #kontak p, #kontak label {
+    color: #fff !important;
 }
 
 .contact-form-wrapper{
-    background:rgba(255,255,255,.08);
+    background:rgba(255,255,255,.08) !important;
+    backdrop-filter: blur(10px);
     padding:30px;
     border-radius:20px;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .form-control-custom{
@@ -222,6 +268,10 @@ section{
     border-radius:12px!important;
 }
 
+.form-control-custom::placeholder {
+    color: rgba(255,255,255,0.5) !important;
+}
+
 .btn-send{
     background:linear-gradient(135deg,#00d4ff,#1e6fdc);
     border:none;
@@ -229,6 +279,7 @@ section{
     border-radius:50px;
     padding:12px;
     width:100%;
+    font-weight: 600;
 }
 
 /* ================= MODAL ================= */
@@ -285,8 +336,8 @@ section{
 
 /* ================= FOOTER ================= */
 footer{
-    background:#08111f;
-    color:#fff;
+    background:#08111f !important;
+    color:#fff !important;
     padding:20px;
     text-align:center;
 }
