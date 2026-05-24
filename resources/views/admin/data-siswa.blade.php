@@ -27,54 +27,65 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-50">
-                    <tr class="hover:bg-gray-50/70 transition">
-                        <td class="p-3 text-center">1</td>
-                        
-                        <td class="p-3">
-                            <span class="block font-semibold text-gray-900 truncate">Contoh Siswa</span>
-                            <span class="block text-xs font-mono text-blue-600">12345</span>
-                        </td>
-                        
-                        <td class="p-3 text-center">
-                            <span class="sm:inline hidden">Laki-laki</span>
-                            <span class="sm:hidden inline">L</span>
-                        </td>
-                        
-                        <td class="p-3 lg:table-cell hidden text-gray-600">2010-05-12</td>
-                        
-                        <td class="p-3 md:table-cell hidden text-gray-500 truncate" title="Jl. Contoh No. 12">
-                            Jl. Contoh No. 12
-                        </td>
-                        
-                        <td class="p-3 sm:table-cell hidden">
-                            <span class="block font-medium text-gray-800 truncate">Budi</span>
-                            <span class="block text-xs text-gray-500">08129999888</span>
-                        </td>
-                        
-                        <td class="p-3 text-center">
-                            <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">10 A</span>
-                        </td>
-                        
-                        <td class="p-3 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
-                                    <i class="fa-solid fa-pen text-xs"></i>
-                                </button>
-                                <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
-                                    <i class="fa-solid fa-trash text-xs"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @forelse($data_siswa as $key => $siswa)
+                        <tr class="hover:bg-gray-50/70 transition">
+                            <td class="p-3 text-center">{{ $data_siswa->firstItem() + $key }}</td>
+                            
+                            <td class="p-3">
+                                <span class="block font-semibold text-gray-900 truncate">{{ $siswa->nama_siswa }}</span>
+                                <span class="block text-xs font-mono text-blue-600">{{ $siswa->nis }}</span>
+                            </td>
+                            
+                            <td class="p-3 text-center">
+                                <span class="sm:inline hidden">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
+                                <span class="sm:hidden inline">{{ $siswa->jenis_kelamin }}</span>
+                            </td>
+                            
+                            <td class="p-3 lg:table-cell hidden text-gray-600">{{ $siswa->tgl_lahir }}</td>
+                            
+                            <td class="p-3 md:table-cell hidden text-gray-500 truncate" title="{{ $siswa->alamat }}">
+                                {{ $siswa->alamat }}
+                            </td>
+                            
+                            <td class="p-3 sm:table-cell hidden">
+                                <span class="block font-medium text-gray-800 truncate">{{ $siswa->wali_murid }}</span>
+                                <span class="block text-xs text-gray-500">{{ $siswa->no_telp_wali }}</span>
+                            </td>
+                            
+                            <td class="p-3 text-center">
+                                <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
+                                    {{ $siswa->kelas->nama_kelas ?? 'Tanpa Kelas' }}
+                                </span>
+                            </td>
+                            
+                            <td class="p-3 text-center">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-gray-400 italic">
+                                Belum ada data siswa.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+
+            <div class="mt-4 px-3">
+                {{ $data_siswa->links() }}
+            </div>
         </div>
     </div>
 
-    <div x-show="openTambah" 
-         x-transition.opacity
-         class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        
+    <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
         
         <div class="flex min-h-full items-center justify-center p-4">
@@ -88,21 +99,18 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">NIS</label>
-                                <input type="text" name="nis" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nis" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Nama Siswa</label>
-                                <input type="text" name="nama_siswa" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nama_siswa" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" required 
-                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
@@ -110,35 +118,29 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                                <input type="date" name="tgl_lahir" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="date" name="tgl_lahir" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">No. Telepon Siswa</label>
-                                <input type="text" name="no_telp" 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="no_telp" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Kelas</label>
-                                <select name="kode_kelas" required 
-                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <select name="kode_kelas" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     <option value="">-- Pilih Kelas --</option>
-                                    
                                     <optgroup label="Tingkat 10">
                                         <option value="10_A">10 A</option>
                                         <option value="10_B">10 B</option>
                                         <option value="10_C">10 C</option>
                                     </optgroup>
-
                                     <optgroup label="Tingkat 11">
                                         <option value="11_A">11 A</option>
                                         <option value="11_B">11 B</option>
                                         <option value="11_C">11 C</option>
                                     </optgroup>
-
                                     <optgroup label="Tingkat 12">
                                         <option value="12_A">12 A</option>
                                         <option value="12_B">12 B</option>
@@ -150,8 +152,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                            <textarea name="alamat" rows="2" required 
-                                      class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+                            <textarea name="alamat" rows="2" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
                         </div>
 
                         <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
@@ -159,24 +160,20 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600">Nama Wali</label>
-                                    <input type="text" name="nama_wali" 
-                                           class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <input type="text" name="nama_wali" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600">No. Telp Wali</label>
-                                    <input type="text" name="no_telp_wali" 
-                                           class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <input type="text" name="no_telp_wali" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-8 flex justify-end gap-3">
-                            <button @click="openTambah = false" type="button" 
-                                    class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                            <button @click="openTambah = false" type="button" class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
                                 Batal
                             </button>
-                            <button type="submit" 
-                                    class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
+                            <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
                                 Simpan
                             </button>
                         </div>
@@ -185,5 +182,6 @@
             </div>
         </div>
     </div>
+
 </div>
 @endsection

@@ -3,95 +3,119 @@
 @section('title', 'Data Mata Pelajaran')
 
 @section('content')
-<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-lg font-bold text-gray-800 uppercase tracking-tight">Data Mata Pelajaran</h2>
-        <!-- Tombol Pemicu Modal -->
-        <button type="button" onclick="toggleModal('modal-mapel')" class="bg-[#2563eb] hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-lg shadow-blue-200">
-            Tambah Mata Pelajaran <i class="fa-solid fa-plus text-xs"></i>
-        </button>
-    </div>
+<div x-data="{ openTambah: false }">
 
-    <div class="overflow-x-auto border rounded-xl">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 border-b text-gray-700 font-bold text-center">
-                <tr>
-                    <th class="px-4 py-4 w-16">No</th>
-                    <th class="px-4 py-4 text-left">Kode Mapel</th>
-                    <th class="px-4 py-4 text-left">Nama Mata Pelajaran</th>
-                    <th class="px-4 py-4">Kelompok</th>
-                    <th class="px-4 py-4">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y text-center">
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-4 text-gray-500">1</td>
-                    <td class="px-4 py-4 text-left font-mono text-blue-600">MP001</td>
-                    <td class="px-4 py-4 text-left font-medium text-gray-800">Matematika (Wajib)</td>
-                    <td class="px-4 py-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-bold">Kelompok A</span></td>
-                    <td class="px-4 py-4">
-                        <div class="flex justify-center gap-4">
-                            <button class="text-blue-600 hover:underline font-semibold">Ubah</button>
-                            <button class="text-red-500 hover:underline font-semibold">Hapus</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <div class="p-4 sm:p-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">DATA MATA PELAJARAN</h2>
 
-<!-- MODAL TAMBAH MAPEL -->
-<div id="modal-mapel" class="hidden fixed inset-0 z-50 overflow-auto bg-black/40 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl">
-        <div class="flex items-center justify-between p-6 border-b">
-            <h3 class="text-xl font-bold text-gray-800">Tambah Mata Pelajaran</h3>
-            <button type="button" onclick="toggleModal('modal-mapel')" class="text-gray-400 hover:text-gray-600">
-                <i class="fa-solid fa-xmark text-xl"></i>
+        <div class="flex justify-end mb-3">
+            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
+                + Tambah Mata Pelajaran
             </button>
         </div>
-        <form action="#" class="p-6 space-y-4">
-            @csrf
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Kode Mapel</label>
-                <input type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Contoh: MTK-01">
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
+            <table class="w-full table-fixed text-sm">
+                <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
+                    <tr>
+                        <th class="p-3 text-center w-[8%]">No</th>
+                        <th class="p-3 text-left w-[25%]">Kode Mapel</th>
+                        <th class="p-3 text-left w-[44%]">Nama Mata Pelajaran</th>
+                        <th class="p-3 text-center w-[15%] sm:table-cell hidden">Kelompok</th>
+                        <th class="p-3 text-center w-[8%]">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 divide-y divide-gray-50">
+                    <tr class="hover:bg-gray-50/70 transition">
+                        <td class="p-3 text-center">1</td>
+                        
+                        <td class="p-3">
+                            <span class="block font-mono text-blue-600 font-semibold uppercase">MP001</span>
+                        </td>
+                        
+                        <td class="p-3">
+                            <span class="block font-semibold text-gray-900 truncate" title="Matematika (Wajib)">Matematika (Wajib)</span>
+                            <!-- Info kelompok muncul di bawah nama mapel khusus layar HP -->
+                            <span class="inline-block sm:hidden text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-semibold mt-1">
+                                Kelompok A
+                            </span>
+                        </td>
+                        
+                        <td class="p-3 text-center sm:table-cell hidden">
+                            <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
+                                Kelompok A
+                            </span>
+                        </td>
+                        
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH MAPEL -->
+    <div x-show="openTambah" 
+         x-transition.opacity
+         class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
+        
+        <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
+        
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-xl">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Mata Pelajaran</h3>
+                    
+                    <form action="#" method="POST" class="space-y-4">
+                        @csrf
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Kode Mapel</label>
+                                <input type="text" name="kode_mapel" required placeholder="Contoh: MTK-01"
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-gray-400">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Kelompok</label>
+                                <select name="kelompok" required 
+                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
+                                    <option value="">-- Pilih Kelompok --</option>
+                                    <option value="Kelompok A">Kelompok A (Wajib)</option>
+                                    <option value="Kelompok B">Kelompok B (Wajib)</option>
+                                    <option value="Kelompok C">Kelompok C (Peminatan)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nama Mata Pelajaran</label>
+                            <input type="text" name="nama_mapel" required 
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        </div>
+
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button @click="openTambah = false" type="button" 
+                                    class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                                Batal
+                            </button>
+                            <button type="submit" 
+                                    class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Mata Pelajaran</label>
-                <input type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Kelompok</label>
-                <select class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-                    <option>Kelompok A (Wajib)</option>
-                    <option>Kelompok B (Wajib)</option>
-                    <option>Kelompok C (Peminatan)</option>
-                </select>
-            </div>
-            <div class="flex justify-end gap-3 pt-6">
-                <button type="button" onclick="toggleModal('modal-mapel')" class="px-6 py-2 border rounded-full text-gray-600 font-semibold hover:bg-gray-50 transition">Batal</button>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition shadow-md">Simpan Data</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<!-- JAVASCRIPT UNTUK MODAL -->
-<script>
-    function toggleModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.toggle('hidden');
-        }
-    }
-
-    // Opsional: Menutup modal jika user klik di luar kotak modal
-    window.onclick = function(event) {
-        const modal = document.getElementById('modal-mapel');
-        if (event.target == modal) {
-            modal.classList.add('hidden');
-        }
-    }
-</script>
-
 @endsection
