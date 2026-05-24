@@ -30,7 +30,7 @@
 <div class="flex">
 
     <!-- SIDEBAR WALI KELAS -->
-    <aside class="w-[250px] min-h-screen fixed text-white flex flex-col shadow-xl bg-gradient-to-b from-[#0d2856] to-[#1e6fdc]">
+    <aside class="w-[210px] min-h-screen fixed text-white flex flex-col shadow-xl bg-gradient-to-b from-[#0d2856] to-[#1e6fdc]">
 
         <div class="p-5 border-b border-white/10 text-center">
             <h4 class="text-xl font-extrabold tracking-widest">E - RAPOR</h4>

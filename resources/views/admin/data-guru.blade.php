@@ -1,45 +1,67 @@
 @extends('layout.admin-app')
 
-@section('title', 'Data Guru | e-Rapor')
-
 @section('content')
 <div x-data="{ openTambah: false }">
-    <div class="p-6">
-        <h2 class="text-xl font-bold mb-4 uppercase tracking-wider text-gray-700">Data Guru</h2>
 
-        <!-- Button Tambah -->
+    <div class="p-4 sm:p-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">DATA GURU</h2>
+
         <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition flex items-center gap-2">
-                <span>Tambah Data Guru</span>
-                <i class="fa-solid fa-plus text-xs"></i>
+            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
+                + Tambah Data Guru
             </button>
         </div>
 
-        <!-- Table -->
-        <div class="bg-white rounded-xl shadow-md p-4 overflow-x-auto">
-            <table class="w-full border-collapse">
-                <thead class="bg-gray-100">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
+            <table class="w-full table-fixed text-sm">
+                <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
                     <tr>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">No</th>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">Nama Guru</th>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">NIP</th>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">Alamat</th>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">No Tlp</th>
-                        <th class="border p-3 text-left text-sm font-bold text-gray-600">Tgl Lahir</th>
-                        <th class="border p-3 text-center text-sm font-bold text-gray-600">Aksi</th>
+                        <th class="p-3 text-center w-[6%]">No</th>
+                        <th class="p-3 text-left w-[27%]">Guru (NIP)</th>
+                        <th class="p-3 text-center w-[12%]">L/P</th>
+                        <th class="p-3 text-left w-[15%] lg:table-cell hidden">Tgl Lahir</th>
+                        <th class="p-3 text-left w-[22%] md:table-cell hidden">Alamat</th>
+                        <th class="p-3 text-center w-[10%] sm:table-cell hidden">Role</th>
+                        <th class="p-3 text-center w-[8%]">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-600">
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="border p-3 text-center">1</td>
-                        <td class="border p-3">Nama Guru Contoh</td>
-                        <td class="border p-3">198701012010011001</td>
-                        <td class="border p-3">Batam Center</td>
-                        <td class="border p-3">08123456789</td>
-                        <td class="border p-3">01-01-1987</td>
-                        <td class="border p-3 text-center">
-                            <button class="text-blue-500 hover:text-blue-700 font-semibold mx-1">Ubah</button>
-                            <button class="text-red-500 hover:text-red-700 font-semibold mx-1">Hapus</button>
+                <tbody class="text-gray-700 divide-y divide-gray-50">
+                    <tr class="hover:bg-gray-50/70 transition">
+                        <td class="p-3 text-center">1</td>
+                        
+                        <td class="p-3">
+                            <span class="block font-semibold text-gray-900 truncate">Nama Guru, S.Pd</span>
+                            <span class="block text-xs font-mono text-blue-600">198701022015031002</span>
+                            <span class="block text-[11px] text-gray-400 sm:hidden">08123456789</span>
+                        </td>
+                        
+                        <td class="p-3 text-center">
+                            <span class="sm:inline hidden">Perempuan</span>
+                            <span class="sm:hidden inline">P</span>
+                        </td>
+                        
+                        <td class="p-3 lg:table-cell hidden text-gray-600">1987-01-02</td>
+                        
+                        <td class="p-3 md:table-cell hidden text-gray-500">
+                            <span class="block truncate" title="Jl. Pendidikan No. 45">Jl. Pendidikan No. 45</span>
+                            <span class="block text-xs text-gray-400">Hub: 08123456789</span>
+                        </td>
+                        
+                        <td class="p-3 text-center sm:table-cell hidden">
+                            <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
+                                Guru Mapel
+                            </span>
+                        </td>
+                        
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -47,71 +69,80 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH DATA GURU -->
     <div x-show="openTambah" 
          x-transition.opacity
          class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="openTambah = false"></div>
+        <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
         
-        <!-- Modal Panel -->
         <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-lg">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-xl">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-6 border-b pb-2">
-                        <h3 class="text-xl font-bold text-gray-900">Tambah Data Guru</h3>
-                        <button @click="openTambah = false" class="text-gray-400 hover:text-gray-600">
-                            <i class="fa-solid fa-xmark text-lg"></i>
-                        </button>
-                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Data Guru</h3>
                     
                     <form action="#" method="POST" class="space-y-4">
                         @csrf
                         
-                        <!-- Nama Guru -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Guru</label>
-                            <input type="text" name="nama_guru" required 
-                                   class="block w-full rounded-lg border border-gray-300 p-2.5 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">NIP</label>
+                                <input type="text" name="nip" required 
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nama Guru</label>
+                                <input type="text" name="nama_guru" required 
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </div>
                         </div>
 
-                        <!-- NIP -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                            <input type="text" name="nip" required 
-                                   class="block w-full rounded-lg border border-gray-300 p-2.5 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
+                                <select name="jenis_kelamin" required 
+                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                                <input type="date" name="tgl_lahir" required 
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </div>
                         </div>
 
-                        <!-- Alamat -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-                            <input type="text" name="alamat" required 
-                                   class="block w-full rounded-lg border border-gray-300 p-2.5 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
+                                <input type="text" name="no_telp" required
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
+                                <select name="role" required 
+                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <option value="">-- Pilih Role --</option>
+                                    <option value="Guru Mapel">Guru Mata Pelajaran</option>
+                                    <option value="Wali Kelas">Wali Kelas</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <!-- No Tlp -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">No Tlp</label>
-                            <input type="text" name="no_tlp" required 
-                                   class="block w-full rounded-lg border border-gray-300 p-2.5 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                            <textarea name="alamat" rows="3" required 
+                                      class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
                         </div>
 
-                        <!-- Tgl Lahir -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tgl Lahir</label>
-                            <input type="date" name="tgl_lahir" required 
-                                   class="block w-full rounded-lg border border-gray-300 p-2.5 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition">
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="mt-8 flex justify-center gap-4">
+                        <div class="mt-8 flex justify-end gap-3">
                             <button @click="openTambah = false" type="button" 
-                                    class="px-8 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition shadow-sm">
+                                    class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
                                 Batal
                             </button>
                             <button type="submit" 
-                                    class="px-8 py-2 text-sm font-bold text-white bg-blue-600 border border-blue-600 rounded-full hover:bg-blue-700 shadow-md transition">
+                                    class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
                                 Simpan
                             </button>
                         </div>
