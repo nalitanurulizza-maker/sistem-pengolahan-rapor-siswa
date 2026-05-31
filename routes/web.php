@@ -53,16 +53,17 @@ Route::middleware(['auth', 'role:guru,walas'])
     ->name('guru.')
     ->group(function () {
         
-        // Fitur Utama Guru & Walas
+        // Fitur Utama Dashboard & Monitoring Nilai
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard-guru');
-        Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
         Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('cek-nilai');
 
-        // Khusus Fitur Tambahan Wali Kelas (Role: Walas)
-        Route::middleware('role:walas')->group(function () {
-            Route::get('/input-kehadiran', [GuruDashboardController::class, 'inputKehadiran'])->name('input-kehadiran');
-            Route::get('/input-catatan', [GuruDashboardController::class, 'inputCatatan'])->name('input-catatan');
-            Route::get('/input-predikat', [GuruDashboardController::class, 'inputPredikat'])->name('input-predikat');
-            Route::get('/cetak-rapor', [GuruDashboardController::class, 'cetakRapor'])->name('cetak-rapor');
-        });
+        // Fitur Input Nilai (GET untuk Tampilan & AJAX, POST untuk Simpan Masal dari Modal)
+        Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
+        Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');
+
+        // Fitur Manajemen Wali Kelas & Guru (Dibuka akses dasarnya agar dikontrol via Blade @if)
+        Route::get('/input-kehadiran', [GuruDashboardController::class, 'inputKehadiran'])->name('input-kehadiran');
+        Route::get('/input-catatan', [GuruDashboardController::class, 'inputCatatan'])->name('input-catatan');
+        Route::get('/input-predikat', [GuruDashboardController::class, 'inputPredikat'])->name('input-predikat');
+        Route::get('/cetak-rapor', [GuruDashboardController::class, 'cetakRapor'])->name('cetak-rapor');
     });
