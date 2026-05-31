@@ -1,234 +1,124 @@
-@extends('layout.admin-app')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title')</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
 
-@section('content')
-<div x-data="{ openTambah: false, openEdit: false }" 
-     x-init="@if(request()->has('edit_nip')) openEdit = true @endif">
+<body class="bg-[#f0f6ff]">
+<div class="flex">
 
-    <div class="p-4 sm:p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-800">DATA GURU</h2>
+    {{-- ── SIDEBAR GURU (Mengikuti Desain Gradien Admin) ── --}}
+    <aside class="w-[210px] min-h-screen fixed text-white flex flex-col shadow-xl bg-gradient-to-b from-[#0d2856] to-[#1e6fdc]">
 
-        @if(session('success'))
-            <div class="mb-4 p-3 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-200 text-sm font-semibold">
-                {{ session('success') }}
+        <div class="p-4 border-b border-white/10 text-center">
+            <h4 class="text-lg font-extrabold tracking-widest">E - RAPOR</h4>
+        </div>
+
+        {{-- Navigasi Menu Guru --}}
+        <nav class="mt-4 flex-1 overflow-y-auto">
+            
+            <a href="{{ route('guru.dashboard-guru') }}" 
+               class="block py-3 px-4 hover:bg-white/10 transition text-sm {{ request()->routeIs('guru.dashboard-guru') ? 'bg-white/20 font-bold' : '' }}">
+                <i class="fa-solid fa-house w-5"></i> Dashboard
+            </a>
+
+            {{-- Dropdown Input Nilai --}}
+            <div x-data="{ open: {{ request()->is('guru/input-*') ? 'true' : 'false' }} }">
+                <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
+                    <span class="flex items-center">
+                        <i class="fa-solid fa-pen-to-square w-5"></i> Input Nilai
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak class="bg-black/10 pb-2">
+                    <a href="{{ route('guru.input-nilai') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.input-nilai') ? 'text-blue-300 font-bold' : '' }}">
+                        + Input Nilai Rapor
+                    </a>
+                </div>
             </div>
-        @endif
 
-        <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
-                + Tambah Data Guru
+            {{-- Dropdown Nilai Tersimpan --}}
+            <div x-data="{ open: {{ request()->is('guru/cek-*') ? 'true' : 'false' }} }">
+                <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
+                    <span class="flex items-center">
+                        <i class="fa-solid fa-box-archive w-5"></i> Nilai Tersimpan
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak class="bg-black/10 pb-2">
+                    <a href="{{ route('guru.cek-nilai') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.cek-nilai') ? 'text-blue-300 font-bold' : '' }}">
+                        + Cek Nilai Rapor
+                    </a>
+                </div>
+            </div>
+
+            {{-- Fitur Tambahan Khusus Wali Kelas (Walas) --}}
+            @if(isset($data_guru_aktif) && (strtolower($data_guru_aktif->role ?? '') === 'walas' || strtolower($data_guru_aktif->role ?? '') === 'wali kelas'))
+                <div x-data="{ open: {{ request()->is('guru/input-kehadiran') || request()->is('guru/input-catatan') || request()->is('guru/cetak-*') ? 'true' : 'false' }} }" class="mt-2">
+                    <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm border-t border-white/5 pt-3">
+                        <span class="flex items-center text-amber-300 font-medium">
+                            <i class="fa-solid fa-id-card-clip w-5"></i> Wali Kelas
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-amber-300 transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open" x-cloak class="bg-black/10 pb-2">
+                        <a href="{{ route('guru.input-kehadiran') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.input-kehadiran') ? 'text-blue-300 font-bold' : '' }}">
+                            + Input Kehadiran
+                        </a>
+                        <a href="{{ route('guru.input-catatan') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.input-catatan') ? 'text-blue-300 font-bold' : '' }}">
+                            + Catatan Wali Kelas
+                        </a>
+                        <a href="{{ route('guru.cetak-rapor') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.cetak-rapor') ? 'text-blue-300 font-bold' : '' }}">
+                            + Cetak Rapor
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+        </nav>
+
+        {{-- Tombol Logout POST --}}
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="w-full py-4 px-4 hover:bg-red-500 transition border-t border-white/10 mt-auto text-sm text-left text-white cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
             </button>
-        </div>
+        </form>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
-            <table class="w-full table-fixed text-sm">
-                <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
-                    <tr>
-                        <th class="p-3 text-center w-[6%]">No</th>
-                        <th class="p-3 text-left w-[27%]">Guru (NIP)</th>
-                        <th class="p-3 text-center w-[12%]">L/P</th>
-                        <th class="p-3 text-left w-[15%] lg:table-cell hidden">Tgl Lahir</th>
-                        <th class="p-3 text-left w-[22%] md:table-cell hidden">Alamat</th>
-                        <th class="p-3 text-center w-[10%] sm:table-cell hidden">Role</th>
-                        <th class="p-3 text-center w-[8%]">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-700 divide-y divide-gray-50">
-                    @forelse($data_guru as $index => $guru)
-                    <tr class="hover:bg-gray-50/70 transition">
-                        <td class="p-3 text-center">{{ $index + 1 }}</td>
-                        
-                        <td class="p-3">
-                            <span class="block font-semibold text-gray-900 truncate">{{ $guru->nama_guru }}</span>
-                            <span class="block text-xs font-mono text-blue-600">{{ $guru->nip }}</span>
-                            <span class="block text-[11px] text-gray-400 sm:hidden">{{ $guru->no_telp }}</span>
-                        </td>
-                        
-                        <td class="p-3 text-center">
-                            <span class="sm:inline hidden">{{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
-                            <span class="sm:hidden inline">{{ $guru->jenis_kelamin }}</span>
-                        </td>
-                        
-                        <td class="p-3 lg:table-cell hidden text-gray-600">{{ $guru->tgl_lahir ?? '-' }}</td>
-                        
-                        <td class="p-3 md:table-cell hidden text-gray-500">
-                            <span class="block truncate" title="{{ $guru->alamat }}">{{ $guru->alamat ?? '-' }}</span>
-                            <span class="block text-xs text-gray-400">Hub: {{ $guru->no_telp ?? '-' }}</span>
-                        </td>
-                        
-                        <td class="p-3 text-center sm:table-cell hidden">
-                            <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
-                                {{ $guru->role ?? 'Guru' }}
-                            </span>
-                        </td>
-                        
-                        <td class="p-3 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <a href="{{ route('admin.data-guru', ['edit_nip' => $guru->nip]) }}" 
-                                   class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
-                                    <i class="fa-solid fa-pen text-xs"></i>
-                                </a>
+    </aside>
 
-                                <form action="{{ route('admin.guru.destroy', $guru->nip) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus guru ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
-                                        <i class="fa-solid fa-trash text-xs"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="p-8 text-center text-gray-400">
-                            <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
-                            Belum ada data guru di dalam database.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+    {{-- ── KONTEN WORKSPACE UTAMA GURU ── --}}
+    <div class="ml-[210px] flex-1 p-6 transition-all duration-300">
 
-    <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-xl">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Data Guru</h3>
-                    
-                    <form action="{{ route('admin.guru.store') }}" method="POST" class="space-y-4">
-                        @csrf
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">NIP</label>
-                                <input type="text" name="nip" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Nama Guru</label>
-                                <input type="text" name="nama_guru" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
-                                    <option value="">-- Pilih Jenis Kelamin --</option>
-                                    <option value="L">Laki-laki</option>
-                                    <option value="P">Perempuan</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                                <input type="date" name="tgl_lahir" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                                <input type="text" name="no_telp" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
-                                <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
-                                    <option value="">-- Pilih Role --</option>
-                                    <option value="Guru">Guru</option>
-                                    <option value="Walas">Wali Kelas</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                            <textarea name="alamat" rows="3" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
-                        </div>
-
-                        <div class="mt-8 flex justify-end gap-3">
-                            <button @click="openTambah = false" type="button" class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-                                Batal
-                            </button>
-                            <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
-                                Simpan
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        {{-- Topbar Gradien Guru --}}
+        <div class="rounded-2xl p-4 text-white shadow-lg flex justify-between items-center bg-gradient-to-r from-[#1e6fdc] to-[#00d4ff]">
+            <div class="font-semibold text-sm sm:text-base">
+                E-RAPOR SMA | <span class="opacity-80">Halaman Guru</span>
+            </div>
+            <div class="bg-white/20 px-4 py-1 rounded-full flex items-center gap-2">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span class="text-sm">{{ Auth::user()->name }}</span>
             </div>
         </div>
-    </div>
 
-    @if($guru_edit)
-    <div x-show="openEdit" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        <div class="fixed inset-0 bg-black/50" @click="window.location.href='{{ route('admin.data-guru') }}'"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-xl">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Edit Data Guru</h3>
-                    
-                    <form action="{{ route('admin.guru.update', $guru_edit->nip) }}" method="POST" class="space-y-4">
-                        @csrf
-                        @method('PUT') <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">NIP (Kunci)</label>
-                                <input type="text" value="{{ $guru_edit->nip }}" disabled class="mt-1 block w-full rounded-lg border border-gray-200 bg-gray-50 p-2 text-sm font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Nama Guru</label>
-                                <input type="text" name="nama_guru" value="{{ $guru_edit->nama_guru }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm bg-white">
-                                    <option value="L" {{ $guru_edit->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="P" {{ $guru_edit->jenis_kelamin == 'P' ? 'selected' : '' }}>Perempuan</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                                <input type="date" name="tgl_lahir" value="{{ $guru_edit->tgl_lahir }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                                <input type="text" name="no_telp" value="{{ $guru_edit->no_telp }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
-                                <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm bg-white">
-                                    <option value="Guru" {{ $guru_edit->role == 'Guru' ? 'selected' : '' }}>Guru</option>
-                                    <option value="Walas" {{ $guru_edit->role == 'Walas' ? 'selected' : '' }}>Wali Kelas</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                            <textarea name="alamat" rows="3" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">{{ $guru_edit->alamat }}</textarea>
-                        </div>
-
-                        <div class="mt-8 flex justify-end gap-3">
-                            <button type="button" @click="window.location.href='{{ route('admin.data-guru') }}'" class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-                                Batal
-                            </button>
-                            <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
-                                Perbarui
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        {{-- Tempat Render Content Anak --}}
+        <div class="mt-4">
+            @yield('content')
         </div>
+
     </div>
-    @endif
 
 </div>
-@endsection
+</body>
+</html>

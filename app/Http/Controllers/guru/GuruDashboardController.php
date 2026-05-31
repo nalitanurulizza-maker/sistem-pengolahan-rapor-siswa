@@ -37,9 +37,10 @@ class GuruDashboardController extends Controller
         $namaKelas = '-';
         $userRole  = strtolower($user->role ?? '');
 
-        $dataGuruAsli = DB::table('guru')->where('nama_guru', $user->name)->first();
-        if ($dataGuruAsli) {
-            $userRole = strtolower($dataGuruAsli->role ?? $userRole);
+        // Menggunakan variabel spesifik data_guru_aktif agar tidak merusak array data_guru milik Admin
+        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
+        if ($data_guru_aktif) {
+            $userRole = strtolower($data_guru_aktif->role ?? $userRole);
         }
 
         if ($userRole === 'walas') {
@@ -47,7 +48,8 @@ class GuruDashboardController extends Controller
             $namaKelas = $cekKelas ? $cekKelas->nama_kelas : 'Kelas X-A';
         }
 
-        return view('guru.dashboard-guru', compact('rekapData', 'tahunAkademik', 'namaKelas'));
+        // Lempar variabel login ke view
+        return view('guru.dashboard-guru', compact('rekapData', 'tahunAkademik', 'namaKelas', 'data_guru_aktif'));
     }
 
     public function inputNilai(Request $request)
@@ -72,13 +74,16 @@ class GuruDashboardController extends Controller
                 })
                 ->where('siswa.kode_kelas', $kode_kelas)
                 ->select('siswa.*', "nilai.{$kolomNilai} as nilai_sekarang")
-                ->orderBy('siswa.nama_siswa', 'asc') // Urutkan nama siswa dari A sampai Z
+                ->orderBy('siswa.nama_siswa', 'asc')
                 ->get();
 
             return response()->json($siswa);
         }
 
-        return view('guru.input-nilai', compact('kelas', 'mata_pelajaran'));
+        $user = Auth::user();
+        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
+
+        return view('guru.input-nilai', compact('kelas', 'mata_pelajaran', 'data_guru_aktif'));
     }
 
     public function simpanNilaiBatch(Request $request)
@@ -90,15 +95,13 @@ class GuruDashboardController extends Controller
             'nilai'       => 'nullable|array', 
         ]);
 
-        // Intersepsi otomatis jika request hapus datang dari tombol aksi tabel tunggal (membawa payload NIS)
-        if ($request->has('nis') && !$request->has('nilai')) {
-            $request->merge([
-                'nilai' => [$request->nis => null]
-            ]);
+        $dataNilai = $request->nilai ?? [];
+        if ($request->has('nis') && empty($dataNilai)) {
+            $dataNilai = [$request->nis => null];
         }
 
-        if ($request->nilai) {
-            foreach ($request->nilai as $nis => $nilai_angka) {
+        if (!empty($dataNilai)) {
+            foreach ($dataNilai as $nis => $nilai_angka) {
                 
                 $kolomNilai = 'nilai_akhir';
                 if (strtolower($request->jenis_nilai) == 'harian')     { $kolomNilai = 'nilai_harian'; }
@@ -111,14 +114,12 @@ class GuruDashboardController extends Controller
                     ->first();
 
                 if ($exists) {
-                    // Jika data ada di DB dan input bernilai kosong/null, ubah data di DB menjadi null (Aksi Hapus)
                     $nilai_simpan = ($nilai_angka === null || $nilai_angka === '') ? null : $nilai_angka;
                     
                     DB::table('nilai')
                         ->where('kode_nilai', $exists->kode_nilai)
                         ->update([$kolomNilai => $nilai_simpan, 'updated_at' => now()]);
                 } else {
-                    // Jika data tidak ada di DB dan input kosong, lewati (jangan buat record kosong baru)
                     if ($nilai_angka === null || $nilai_angka === '') continue;
 
                     DB::table('nilai')->insert([
@@ -134,7 +135,6 @@ class GuruDashboardController extends Controller
             }
         }
 
-        // Return response JSON jika dipicu oleh AJAX JavaScript (Hapus atau Simpan Massal tanpa reload)
         if ($request->ajax()) {
             return response()->json([
                 'status' => 'success', 
@@ -142,7 +142,6 @@ class GuruDashboardController extends Controller
             ]);
         }
 
-        // Fallback jika diakses melalui submit form standar biasa
         return redirect()->back()->with('success', 'Data nilai siswa berhasil diperbarui!');
     }
 
