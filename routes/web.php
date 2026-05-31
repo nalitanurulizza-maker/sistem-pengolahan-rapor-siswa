@@ -39,10 +39,20 @@ Route::middleware(['auth', 'role:admin'])
         // Halaman Dashboard Utama Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard-admin');
         
-        // Kelola Data Master
+       // ── KELOLA DATA MASTER ADMIN ─────────────────────────────────────────
+        // Manajemen Data Master Siswa
         Route::get('/data-siswa', [SiswaController::class, 'index'])->name('data-siswa');
+        Route::post('/data-siswa', [SiswaController::class, 'store'])->name('siswa.store');
+        Route::put('/data-siswa/{nis}', [SiswaController::class, 'update'])->name('siswa.update');
+        Route::delete('/data-siswa/{nis}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
+
+        // Manajemen Data Master Guru
         Route::get('/data-guru', [GuruController::class, 'index'])->name('data-guru');
-        Route::post('/data-guru', [GuruController::class, 'store']);
+        Route::post('/data-guru', [GuruController::class, 'store'])->name('guru.store');
+        Route::put('/data-guru/{nip}', [GuruController::class, 'update'])->name('guru.update');
+        Route::delete('/data-guru/{nip}', [GuruController::class, 'destroy'])->name('guru.destroy');
+
+        // Data Master Akademik
         Route::get('/mata-pelajaran', [MapelController::class, 'index'])->name('mata-pelajaran');
         Route::get('/tahun-akademik', [TahunAkademikController::class, 'index'])->name('tahun-akademik');
     });
