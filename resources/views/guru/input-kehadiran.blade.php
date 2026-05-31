@@ -1,4 +1,4 @@
-@extends('layout.walas-app')
+@extends('layout.guru-app')
 
 @section('title', 'Input Kehadiran Siswa | E-Rapor')
 

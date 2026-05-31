@@ -6,7 +6,7 @@
     </h4>
 
     <nav class="mt-4">
-        <a href="{{ route('admin-dashboard') }}" class="block py-3 px-5 hover:bg-white/10 transition">
+        <a href="{{ route('admin.dashboard-admin') }}" class="block py-3 px-5 hover:bg-white/10 transition">
             <i class="fa-solid fa-house w-6"></i> Dashboard
         </a>
 

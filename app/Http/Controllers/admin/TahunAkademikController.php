@@ -1,17 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin; // Tetap mengunci di folder Admin agar sinkron dengan rute web.php
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Admin\TahunAkademikModel; // Panggil model Tahun Akademik
+// Memanggil Model TahunAkademik asli penampung data di phpMyAdmin kamu
+use App\Models\Admin\TahunAkademik; 
 
 class TahunAkademikController extends Controller
 {
     public function index()
     {
-        $data_tahun = TahunAkademikModel::all();
+        // Mengambil semua baris data tahun akademik dari database phpMyAdmin
+        // Menggunakan pengaman class_exists agar jika model belum siap/migrasi kosong, halaman TIDAK AKAN CRASH
+        $data = class_exists('App\Models\Admin\TahunAkademik') ? TahunAkademik::all() : collect();
 
-        return view('admin.tahun-akademik', compact('data_tahun'));
+        // Mengirimkan variabel $data ke file Blade index di dalam folder admin/tahun-akademik/
+        return view('admin.tahun-akademik.index', compact('data'));
     }
 }

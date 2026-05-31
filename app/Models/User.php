@@ -2,48 +2,68 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // <-- 1. IMPORT INI WAJIB ADA
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable; // <-- 2. PASANG HASFACTORY DI SINI
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    const ROLE_ADMIN = 'Admin';
+    const ROLE_GURU  = 'Guru';
+    const ROLE_WALAS = 'Walas';
+
     protected $fillable = [
         'name',
-        'email',
+        'username',
         'password',
+        'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    protected $casts = [
+        'password'   => 'hashed',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    // ── WAJIB DITAMBAHKAN ─────────────────────────────────────────────────────
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Override default 'email' menjadi 'username' untuk Auth::attempt()
      */
-    protected function casts(): array
+    public function getAuthIdentifierName(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return 'username';
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === self::ROLE_GURU;
+    }
+
+    public function isWalas(): bool
+    {
+        return $this->role === self::ROLE_WALAS;
+    }
+
+    public function isPengajar(): bool
+    {
+        return in_array($this->role, [self::ROLE_GURU, self::ROLE_WALAS]);
+    }
+
+    public function hasRole(string|array $roles): bool
+    {
+        return in_array($this->role, (array) $roles);
     }
 }
