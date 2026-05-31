@@ -1,47 +1,66 @@
 <?php
 
-namespace App\Http\Controllers\Guru; // Kunci: Folder Guru dengan G kapital sesuai rute
+namespace App\Http\Controllers\Guru; 
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class GuruDashboardController extends Controller
 {
     public function index()
     {
+        // 1. Ambil data user yang sedang login saat ini
         $user = Auth::user();
 
-        // 1. Suntik fungsi isWalas() dinamis ke objek User saat ini agar Blade tidak crash
-        if (!method_exists($user, 'isWalas')) {
-            $user->macro('isWalas', function () {
-                return strtolower($this->role) === 'walas';
-            });
+        // 2. Hitung jumlah data master asli dari phpMyAdmin kamu
+        $jumlahMapel = DB::table('mata_pelajaran')->count() ?: 0;
+        $jumlahSiswa = DB::table('siswa')->count() ?: 0;
+
+        // 3. Hitung rekap nilai (Sesuai kolom asli 'nilai_akhir' di image_f68e26.jpg)
+        $nilaiSudahInput = DB::table('nilai')->whereNotNull('nilai_akhir')->count() ?: 0;
+
+        // Kalkulasi sisa target input nilai (Jumlah Siswa x Jumlah Mapel)
+        $totalTarget = $jumlahSiswa * ($jumlahMapel ?: 1);
+        $nilaiBelumInput = max(0, $totalTarget - $nilaiSudahInput);
+
+        $rekapData = [
+            'jumlahMapel'     => $jumlahMapel,
+            'jumlahSiswa'     => $jumlahSiswa,
+            'nilaiSudahInput' => $nilaiSudahInput,
+            'nilaiBelumInput' => $nilaiBelumInput,
+        ];
+
+        // 4. AMBIL DATA TAHUN AKADEMIK (Sudah sinkron dengan kolom SQL barumu!)
+        $cekTahun = DB::table('tahun_akademik')->where('status', 'Aktif')->first() 
+                 ?? DB::table('tahun_akademik')->first();
+        
+        $tahunAkademik = (object) [
+            'nama_tahun' => $cekTahun ? $cekTahun->nama_tahun : '2025/2026',
+            'semester'   => $cekTahun ? $cekTahun->semester : 'Genap'
+        ];
+
+        // 5. Atur Nama Kelas dinamis jika role-nya adalah 'walas'
+        $namaKelas = '-';
+        $userRole = strtolower($user->role ?? '');
+
+        // Validasi silang ke tabel guru untuk memastikan rolenya ketat
+        $dataGuruAsli = DB::table('guru')->where('nama_guru', $user->name)->first();
+        if ($dataGuruAsli) {
+            $userRole = strtolower($dataGuruAsli->role ?? $userRole);
         }
 
-        // 2. Sediakan data Rekap Mengajar (Set nilai dummy/aman dulu agar tidak crash)
-        $rekapData = [
-            'jumlahMapel'     => 2, // Sesuaikan nanti dengan query tabel mengajar kamu
-            'jumlahSiswa'     => 36,
-            'nilaiSudahInput' => 0,
-            'nilaiBelumInput' => 36,
-        ];
+        if ($userRole === 'walas') {
+            $cekKelas = DB::table('kelas')->first();
+            $namaKelas = $cekKelas ? $cekKelas->nama_kelas : 'Kelas X-A';
+        }
 
-        // 3. Sediakan objek Tahun Akademik tiruan agar Blade aman membaca properti
-        $tahunAkademik = (object) [
-            'nama_tahun' => '2025/2026',
-            'semester'   => 'Genap'
-        ];
-
-        // 4. Sediakan nama kelas dummy jika login sebagai wali kelas
-        $namaKelas = strtolower($user->role) === 'walas' ? 'Kelas X-A' : null;
-
-        // Kirimkan semua variabel yang diminta oleh file Blade
+        // Kirimkan semua variabel bersih ke file Blade guru
         return view('guru.dashboard-guru', compact('rekapData', 'tahunAkademik', 'namaKelas'));
     }
 
-    // Sediakan method kosong lainnya dari image_f7e098.png agar rute web.php tidak teriak error
+    // Method pembantu rute fitur guru & walas agar link di sidebar tidak error 404
     public function inputNilai() { return view('guru.input-nilai'); }
     public function cekNilai() { return view('guru.cek-nilai'); }
     public function inputKehadiran() { return view('guru.input-kehadiran'); }
