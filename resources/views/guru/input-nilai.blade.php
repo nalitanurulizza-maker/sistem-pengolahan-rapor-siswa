@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    {{-- ── NOTIFIKASI SUKSES (Bisa dihapus/didiamkan karena sekarang pakai Alert JS) ── --}}
+    {{-- ── NOTIFIKASI SUKSES ── --}}
     <div id="notif-sukses-ajax" class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold flex items-center gap-2" style="display: none;">
         <i class="fa-solid fa-circle-check text-base"></i> <span id="text-notif">Data berhasil disimpan!</span>
     </div>
@@ -102,7 +102,7 @@
         {{-- Header Modal --}}
         <div style="background:#1a2340; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0;">
             <div>
-                <p style="margin:0; color:#fff; font-weight:700; font-size:0.875rem; text-transform:uppercase; letter-spacing:0.05em;">
+                <p id="modal-main-title" style="margin:0; color:#fff; font-weight:700; font-size:0.875rem; text-transform:uppercase; letter-spacing:0.05em;">
                     Form Input Nilai
                 </p>
                 <p id="modal-sub-title" style="margin:0.25rem 0 0; color:#94a3b8; font-size:0.75rem;"></p>
@@ -155,6 +155,7 @@
     var btnMassal    = document.getElementById('btn-input-massal');
     var overlay      = document.getElementById('overlay-modal');
     var formNilai    = document.getElementById('form-nilai');
+    var modalTitle   = document.getElementById('modal-main-title');
 
     // ── 1. Saat dropdown berubah, tarik data siswa ──
     [selKelas, selMapel, selJenis].forEach(function (el) {
@@ -196,7 +197,7 @@
 
     // ── 2. Intersepsi Submit Form Modal dengan AJAX agar tidak reload/naik ke atas ──
     formNilai.addEventListener('submit', function (e) {
-        e.preventDefault(); // Menghentikan reload halaman bawaan form
+        e.preventDefault();
 
         var btnSubmit = document.getElementById('btn-simpan-submit');
         btnSubmit.disabled = true;
@@ -216,12 +217,10 @@
         .then(function (data) {
             tutupModal();
             
-            // Tampilkan alert flash notifikasi sukses mini tanpa geser layar
             var notif = document.getElementById('notif-sukses-ajax');
             notif.style.display = 'flex';
             setTimeout(function() { notif.style.display = 'none'; }, 3000);
 
-            // Ambil ulang data terbaru untuk tabel (Tabel terupdate otomatis di posisi scroll saat ini)
             onFilterChange(); 
         })
         .catch(function (err) {
@@ -254,7 +253,7 @@
         })
         .then(function(res) {
             if(res.ok) {
-                onFilterChange(); // Refresh data tabel tanpa gerak posisi screen
+                onFilterChange();
             } else {
                 alert('Gagal menghapus nilai.');
             }
@@ -337,6 +336,10 @@
 
     function bukaModalSatuSiswa(siswa) {
         siapkanBaseModal();
+        
+        // Ubah judul utama menjadi Edit Nilai
+        if (modalTitle) modalTitle.textContent = 'Form Edit Nilai';
+
         var container = document.getElementById('modal-list-siswa');
         container.innerHTML = '';
 
@@ -355,6 +358,10 @@
         }
 
         siapkanBaseModal();
+        
+        // Kembalikan judul utama menjadi Input Nilai
+        if (modalTitle) modalTitle.textContent = 'Form Input Nilai';
+
         var container = document.getElementById('modal-list-siswa');
         container.innerHTML = '';
 
@@ -385,7 +392,7 @@
             + '<div style="width:6rem;">'
             +   '<input type="number" name="nilai[' + esc(s.nis) + ']" min="0" max="100" placeholder="0-100" value="' + nilaiLama + '" '
             +          'style="width:100%;padding:0.5rem;border:1px solid #d1d5db;border-radius:10px;text-align:center;'
-            +                'font-weight:700;font-size:1rem;outline:none;" '
+            +                 'font-weight:700;font-size:1rem;outline:none;" '
             +          'onfocus="this.style.borderColor=\'#3b82f6\'" onblur="this.style.borderColor=\'#d1d5db\'">'
             + '</div>';
         return row;

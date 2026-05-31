@@ -98,13 +98,11 @@
 
     </aside>
 
-    {{-- ── KONTEN WORKSPACE UTAMA GURU ── --}}
     <div class="ml-[210px] flex-1 p-6 transition-all duration-300">
 
-        {{-- Topbar Gradien Guru --}}
         <div class="rounded-2xl p-4 text-white shadow-lg flex justify-between items-center bg-gradient-to-r from-[#1e6fdc] to-[#00d4ff]">
             <div class="font-semibold text-sm sm:text-base">
-                E-RAPOR SMA | <span class="opacity-80">Halaman Guru</span>
+                E-RAPOR SMA | <span class="opacity-80">2026/2027</span>
             </div>
             <div class="bg-white/20 px-4 py-1 rounded-full flex items-center gap-2">
                 <i class="fa-solid fa-chalkboard-user"></i>
@@ -112,13 +110,12 @@
             </div>
         </div>
 
-        {{-- Tempat Render Content Anak --}}
         <div class="mt-4">
             @yield('content')
         </div>
 
     </div>
 
-</div>
+    
 </body>
 </html>
