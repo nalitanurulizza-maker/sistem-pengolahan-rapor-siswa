@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:admin'])
         // Kelola Data Master
         Route::get('/data-siswa', [SiswaController::class, 'index'])->name('data-siswa');
         Route::get('/data-guru', [GuruController::class, 'index'])->name('data-guru');
+        Route::post('/data-guru', [GuruController::class, 'store']);
         Route::get('/mata-pelajaran', [MapelController::class, 'index'])->name('mata-pelajaran');
         Route::get('/tahun-akademik', [TahunAkademikController::class, 'index'])->name('tahun-akademik');
     });

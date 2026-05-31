@@ -27,8 +27,8 @@ class Kelas extends Model
     // Relasi ke tabel siswa
     public function siswa()
     {
-        // Parameter 2: Foreign Key di tabel siswa (kelas_id)
+        // Parameter 2: Foreign Key di tabel siswa (kode_kelas)
         // Parameter 3: Primary Key di tabel kelas (kode_kelas)
-        return $this->hasMany(Siswa::class, 'kelas_id', 'kode_kelas');
+        return $this->hasMany(Siswa::class, 'kode_kelas', 'kode_kelas');
     }
 }

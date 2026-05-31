@@ -6,10 +6,33 @@
     <div class="p-4 sm:p-6">
         <h2 class="text-xl font-bold mb-4 text-gray-800">DATA SISWA</h2>
 
-        <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">
+                    PILIH KELAS:
+                </span>
+
+                <form method="GET" action="{{ url()->current() }}">
+                    <select name="kelas" onchange="this.form.submit()" 
+                        class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl px-3 py-2 w-full sm:w-44 
+                        shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition">
+                        
+                        <option value="">Semua Kelas</option>
+                        @foreach ($data_kelas as $kelas)
+                            <option value="{{ $kelas->kode_kelas }}" {{ request('kelas') == $kelas->kode_kelas ? 'selected' : '' }}>
+                                {{ $kelas->nama_kelas }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
+            <button @click="openTambah = true" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow text-sm font-semibold transition">
                 + Tambah Data Siswa
             </button>
+
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
@@ -26,44 +49,61 @@
                         <th class="p-3 text-center w-[8%]">Aksi</th>
                     </tr>
                 </thead>
+
                 <tbody class="text-gray-700 divide-y divide-gray-50">
                     @forelse($data_siswa as $key => $siswa)
                         <tr class="hover:bg-gray-50/70 transition">
-                            <td class="p-3 text-center">{{ $data_siswa->firstItem() + $key }}</td>
-                            
-                            <td class="p-3">
-                                <span class="block font-semibold text-gray-900 truncate">{{ $siswa->nama_siswa }}</span>
-                                <span class="block text-xs font-mono text-blue-600">{{ $siswa->nis }}</span>
-                            </td>
-                            
                             <td class="p-3 text-center">
-                                <span class="sm:inline hidden">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
-                                <span class="sm:hidden inline">{{ $siswa->jenis_kelamin }}</span>
+                                {{ $data_siswa->firstItem() + $key }}
                             </td>
-                            
-                            <td class="p-3 lg:table-cell hidden text-gray-600">{{ $siswa->tgl_lahir }}</td>
-                            
-                            <td class="p-3 md:table-cell hidden text-gray-500 truncate" title="{{ $siswa->alamat }}">
+
+                            <td class="p-3">
+                                <span class="block font-semibold text-gray-900 truncate">
+                                    {{ $siswa->nama_siswa }}
+                                </span>
+                                <span class="block text-xs font-mono text-blue-600">
+                                    {{ $siswa->nis }}
+                                </span>
+                            </td>
+
+                            <td class="p-3 text-center">
+                                <span class="sm:inline hidden">
+                                    {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                </span>
+                                <span class="sm:hidden inline">
+                                    {{ $siswa->jenis_kelamin }}
+                                </span>
+                            </td>
+
+                            <td class="p-3 lg:table-cell hidden text-gray-600">
+                                {{ $siswa->tgl_lahir }}
+                            </td>
+
+                            <td class="p-3 md:table-cell hidden text-gray-500 truncate">
                                 {{ $siswa->alamat }}
                             </td>
-                            
+
                             <td class="p-3 sm:table-cell hidden">
-                                <span class="block font-medium text-gray-800 truncate">{{ $siswa->wali_murid }}</span>
-                                <span class="block text-xs text-gray-500">{{ $siswa->no_telp_wali }}</span>
+                                <span class="block font-medium text-gray-800 truncate">
+                                    {{ $siswa->wali_murid }}
+                                </span>
+                                <span class="block text-xs text-gray-500">
+                                    {{ $siswa->no_telp_wali }}
+                                </span>
                             </td>
-                            
+
                             <td class="p-3 text-center">
-                                <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
+                                <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-xs font-semibold">
                                     {{ $siswa->kelas->nama_kelas ?? 'Tanpa Kelas' }}
                                 </span>
                             </td>
-                            
+
                             <td class="p-3 text-center">
                                 <div class="flex items-center justify-center gap-1.5">
-                                    <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                                    <button class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
                                         <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
-                                    <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
+                                    <button class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
                                         <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
@@ -93,7 +133,7 @@
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Data Siswa</h3>
                     
-                    <form action="#" method="POST" class="space-y-4">
+                    <form action="{{ route('admin.data-siswa') }}" method="POST" class="space-y-4">
                         @csrf
                         
                         <div class="grid grid-cols-2 gap-4">
@@ -112,8 +152,8 @@
                                 <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
                                 <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
-                                    <option value="Laki-laki">Laki-laki</option>
-                                    <option value="Perempuan">Perempuan</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
                                 </select>
                             </div>
                             <div>
@@ -131,21 +171,9 @@
                                 <label class="block text-sm font-medium text-gray-700">Kelas</label>
                                 <select name="kode_kelas" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     <option value="">-- Pilih Kelas --</option>
-                                    <optgroup label="Tingkat 10">
-                                        <option value="10_A">10 A</option>
-                                        <option value="10_B">10 B</option>
-                                        <option value="10_C">10 C</option>
-                                    </optgroup>
-                                    <optgroup label="Tingkat 11">
-                                        <option value="11_A">11 A</option>
-                                        <option value="11_B">11 B</option>
-                                        <option value="11_C">11 C</option>
-                                    </optgroup>
-                                    <optgroup label="Tingkat 12">
-                                        <option value="12_A">12 A</option>
-                                        <option value="12_B">12 B</option>
-                                        <option value="12_C">12 C</option>
-                                    </optgroup>
+                                    @foreach ($data_kelas as $kelas)
+                                        <option value="{{ $kelas->kode_kelas }}">{{ $kelas->nama_kelas }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

@@ -26,7 +26,6 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-50">
-                    {{-- LOOPING DATA ASLI DARI DATABASE --}}
                     @forelse($data_guru as $index => $guru)
                     <tr class="hover:bg-gray-50/70 transition">
                         <td class="p-3 text-center">{{ $index + 1 }}</td>
@@ -34,11 +33,10 @@
                         <td class="p-3">
                             <span class="block font-semibold text-gray-900 truncate">{{ $guru->nama_guru }}</span>
                             <span class="block text-xs font-mono text-blue-600">{{ $guru->nip }}</span>
-                            <span class="block text-[11px] text-gray-400 sm:hidden">{{ $guru->no_telp_guru }}</span>
+                            <span class="block text-[11px] text-gray-400 sm:hidden">{{ $guru->no_telp }}</span>
                         </td>
                         
                         <td class="p-3 text-center">
-                            {{-- Mengubah inisial L/P dari database menjadi teks ramah pengguna --}}
                             <span class="sm:inline hidden">{{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
                             <span class="sm:hidden inline">{{ $guru->jenis_kelamin }}</span>
                         </td>
@@ -47,12 +45,12 @@
                         
                         <td class="p-3 md:table-cell hidden text-gray-500">
                             <span class="block truncate" title="{{ $guru->alamat }}">{{ $guru->alamat ?? '-' }}</span>
-                            <span class="block text-xs text-gray-400">Hub: {{ $guru->no_telp_guru ?? '-' }}</span>
+                            <span class="block text-xs text-gray-400">Hub: {{ $guru->no_telp ?? '-' }}</span>
                         </td>
                         
                         <td class="p-3 text-center sm:table-cell hidden">
                             <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
-                                {{ $guru->role ?? 'Guru Mapel' }}
+                                {{ $guru->role ?? 'Guru' }}
                             </span>
                         </td>
                         
@@ -68,7 +66,6 @@
                         </td>
                     </tr>
                     @empty
-                    {{-- Tampilan jika di database beneran kosong atau tidak ada records --}}
                     <tr>
                         <td colspan="7" class="p-8 text-center text-gray-400">
                             <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
@@ -81,10 +78,7 @@
         </div>
     </div>
 
-    <div x-show="openTambah" 
-         x-transition.opacity
-         class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        
+    <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
         
         <div class="flex min-h-full items-center justify-center p-4">
@@ -92,28 +86,24 @@
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Data Guru</h3>
                     
-                    {{-- Sesuaikan action form ke route POST controller guru Anda --}}
-                    <form action="#" method="POST" class="space-y-4">
+                    <form action="{{ route('admin.data-guru') }}" method="POST" class="space-y-4">
                         @csrf
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">NIP</label>
-                                <input type="text" name="nip" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nip" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Nama Guru</label>
-                                <input type="text" name="nama_guru" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nama_guru" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" required 
-                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
+                                <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
                                     <option value="L">Laki-laki</option>
                                     <option value="P">Perempuan</option>
@@ -121,41 +111,35 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                                <input type="date" name="tgl_lahir" required 
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="date" name="tgl_lahir" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                                <input type="text" name="no_telp_guru" required
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="no_telp" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
-                                <select name="role" required 
-                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
+                                <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
                                     <option value="">-- Pilih Role --</option>
-                                    <option value="Guru Mapel">Guru Mata Pelajaran</option>
-                                    <option value="Wali Kelas">Wali Kelas</option>
+                                    <option value="Guru">Guru</option>
+                                    <option value="Walas">Wali Kelas</option>
                                 </select>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                            <textarea name="alamat" rows="3" required 
-                                      class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+                            <textarea name="alamat" rows="3" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
                         </div>
 
                         <div class="mt-8 flex justify-end gap-3">
-                            <button @click="openTambah = false" type="button" 
-                                    class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                            <button @click="openTambah = false" type="button" class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
                                 Batal
                             </button>
-                            <button type="submit" 
-                                    class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
+                            <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
                                 Simpan
                             </button>
                         </div>

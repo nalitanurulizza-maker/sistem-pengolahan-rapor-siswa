@@ -10,15 +10,19 @@ class Guru extends Model
     use HasFactory;
 
     protected $table = 'guru';
-    protected $primaryKey = 'nip'; // Sesuaikan jika nama kolomnya beneran 'nip'
+    protected $primaryKey = 'nip'; 
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
 
+    // SINKRONISASI: Daftarkan semua kolom database dengan benar di sini
     protected $fillable = [
         'nip',
         'nama_guru',
-        'jenis_kelamin',
-        'no_telp_guru'
+        'tgl_lahir',      // 👈 Diizinkan masuk
+        'no_telp',        // 👈 Nama disamakan dengan database asli kelompokmu
+        'jenis_kelamin',  // 👈 Diizinkan masuk
+        'alamat',         // 👈 Diizinkan masuk
+        'role'            // 👈 Diizinkan masuk
     ];
 }
