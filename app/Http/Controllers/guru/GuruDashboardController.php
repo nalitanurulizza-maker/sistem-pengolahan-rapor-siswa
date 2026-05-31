@@ -145,7 +145,41 @@ class GuruDashboardController extends Controller
         return redirect()->back()->with('success', 'Data nilai siswa berhasil diperbarui!');
     }
 
-    public function cekNilai()       { return view('guru.cek-nilai'); }
+    public function cekNilai(Request $request) 
+    { 
+        $kelas          = DB::table('kelas')->get();
+        $mata_pelajaran = DB::table('mata_pelajaran')->get();
+
+        if ($request->has('kode_kelas')) {
+            $kode_kelas  = $request->kode_kelas;
+            $kode_mp     = $request->kode_mp;
+            $jenis_nilai = strtolower($request->jenis_nilai ?? '');
+
+            $kolomNilai = 'nilai_akhir';
+            if ($jenis_nilai === 'harian')  { $kolomNilai = 'nilai_harian'; }
+            elseif ($jenis_nilai === 'uts') { $kolomNilai = 'nilai_uts'; }
+            elseif ($jenis_nilai === 'uas') { $kolomNilai = 'nilai_uas'; }
+
+            $siswa = DB::table('siswa')
+                ->leftJoin('nilai', function ($join) use ($kode_mp) {
+                    $join->on('siswa.nis', '=', 'nilai.nis')
+                         ->where('nilai.kode_mp', '=', $kode_mp);
+                })
+                ->where('siswa.kode_kelas', $kode_kelas)
+                // PENTING: Menambahkan select nilai_harian, nilai_uts, nilai_uas untuk validasi kelengkapan 3 nilai di JS
+                ->select('siswa.*', "nilai.{$kolomNilai} as nilai_sekarang", "nilai.nilai_harian", "nilai.nilai_uts", "nilai.nilai_uas")
+                ->orderBy('siswa.nama_siswa', 'asc')
+                ->get();
+
+            return response()->json($siswa);
+        }
+
+        $user = Auth::user();
+        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
+
+        return view('guru.cek-nilai', compact('kelas', 'mata_pelajaran', 'data_guru_aktif')); 
+    }
+
     public function inputKehadiran() { return view('guru.input-kehadiran'); }
     public function inputCatatan()   { return view('guru.input-catatan'); }
     public function inputPredikat()  { return view('guru.input-predikat'); }
