@@ -12,6 +12,7 @@
 
 <div class="bg-white p-8 rounded-t-3xl shadow-sm border border-gray-100 mt-6 min-h-[calc(100vh-180px)] flex flex-col">
 
+    {{-- ── FILTER DROPDOWN ── --}}
     <div class="w-full space-y-4 mb-10">
         <div class="flex flex-col md:flex-row md:items-center gap-4">
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Kelas</label>
@@ -53,6 +54,7 @@
         </div>
     </div>
 
+    {{-- ── TABEL DATA SISWA ── --}}
     <div class="overflow-x-auto border rounded-lg shadow-sm">
         <table class="w-full text-sm text-left border-collapse">
             <thead class="bg-gray-50 text-gray-700 font-bold border-b text-xs uppercase">
@@ -75,6 +77,7 @@
         </table>
     </div>
 
+    {{-- ── PAGINATION ── --}}
     <div class="mt-auto pt-10 flex justify-end" id="pagination-container" style="display: none;">
         <div class="flex border border-gray-300 rounded-md overflow-hidden bg-gray-50 text-[10px] shadow-sm">
             <button class="px-2.5 py-1 border-r border-gray-300 hover:bg-gray-200 transition text-gray-500 font-bold">&lt;&lt;</button>
@@ -97,6 +100,7 @@
     var selJenis     = document.getElementById('select-jenis');
     var tbody        = document.getElementById('tabel-siswa-body');
 
+    // Jalankan pencarian otomatis saat ada perubahan di filter dropdown
     [selKelas, selMapel, selJenis].forEach(function (el) {
         el.addEventListener('change', onFilterChange);
     });
@@ -151,7 +155,6 @@
             var colorClass = nilai !== '-' ? 'text-emerald-600 font-bold' : 'text-gray-400 italic';
 
             // ── LOGIKA PENGECEKAN STATUS 3 NILAI ──
-            // Memeriksa properti nilai dari backend (Menyesuaikan field objek database siswa)
             var harianTerisi = s.nilai_harian !== null && s.nilai_harian !== undefined && s.nilai_harian !== '';
             var utsTerisi    = s.nilai_uts    !== null && s.nilai_uts    !== undefined && s.nilai_uts    !== '';
             var uasTerisi    = s.nilai_uas    !== null && s.nilai_uas    !== undefined && s.nilai_uas    !== '';
@@ -159,8 +162,8 @@
             var statusBadge = '';
             
             if (harianTerisi && utsTerisi && uasTerisi) {
-                // Jika ketiga nilai lengkap
-                statusBadge = '<span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold shadow-sm inline-flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Lengkap</span>';
+                // Desain Badge Lengkap dengan warna emerald soft bordered yang elegan
+                statusBadge = '<span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold shadow-sm inline-flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Lengkap</span>';
             } else {
                 // Hitung berapa nilai yang belum diinput
                 var hitungBelum = 0;
@@ -168,7 +171,8 @@
                 if (!utsTerisi) hitungBelum++;
                 if (!uasTerisi) hitungBelum++;
 
-                statusBadge = '<span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold shadow-sm inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Belum Lengkap (' + hitungBelum + ')</span>';
+                // Desain Badge Belum Lengkap dengan warna amber soft bordered yang serasi
+                statusBadge = '<span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-bold shadow-sm inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Kurang ' + hitungBelum + ' Nilai</span>';
             }
 
             var tr = document.createElement('tr');

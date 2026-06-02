@@ -157,7 +157,22 @@
     var formNilai    = document.getElementById('form-nilai');
     var modalTitle   = document.getElementById('modal-main-title');
 
-    // ── 1. Saat dropdown berubah, tarik data siswa ──
+    // ── 1. Pendeteksi Otomatis Jika Dialihkan dari Halaman Cek Nilai ──
+    window.addEventListener('DOMContentLoaded', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var paramKelas = urlParams.get('kelas');
+        var paramMapel = urlParams.get('mapel');
+        var paramJenis = urlParams.get('jenis');
+
+        if (paramKelas && paramMapel && paramJenis) {
+            selKelas.value = paramKelas;
+            selMapel.value = paramMapel;
+            selJenis.value = paramJenis;
+            onFilterChange(); // Langsung trigger pencarian ke database
+        }
+    });
+
+    // Saat dropdown diubah manual oleh pengguna
     [selKelas, selMapel, selJenis].forEach(function (el) {
         el.addEventListener('change', onFilterChange);
     });
@@ -285,7 +300,7 @@
 
         dataSiswa.forEach(function (s, i) {
             var nilai      = s.nilai_sekarang != null ? s.nilai_sekarang : '-';
-            var colorClass = nilai !== '-' ? 'text-emerald-600' : 'text-blue-500';
+            var colorClass = nilai !== '-' ? 'text-emerald-600 font-bold' : 'text-blue-500';
 
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-gray-50 transition';
@@ -293,7 +308,7 @@
                           + '<td class="px-4 py-3 border-r font-semibold text-gray-800">'    + esc(s.nama_siswa) + '</td>'
                           + '<td class="px-4 py-3 border-r text-gray-500">'                  + esc(s.nisn || '-') + '</td>'
                           + '<td class="px-4 py-3 border-r text-gray-500">'                  + esc(s.nis  || '-') + '</td>'
-                          + '<td class="px-4 py-3 border-r text-center text-base font-bold ' + colorClass + '">' + nilai + '</td>'
+                          + '<td class="px-4 py-3 border-r text-center text-base ' + colorClass + '">' + nilai + '</td>'
                           + '<td class="px-4 py-3 text-center flex items-center justify-center gap-2">'
                           + '  <button type="button" class="btn-ubah p-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition shadow-sm flex items-center justify-center w-8 h-8" title="Ubah Nilai">'
                           + '     <i class="fa-solid fa-pen-to-square text-xs"></i>'
@@ -337,7 +352,6 @@
     function bukaModalSatuSiswa(siswa) {
         siapkanBaseModal();
         
-        // Ubah judul utama menjadi Edit Nilai
         if (modalTitle) modalTitle.textContent = 'Form Edit Nilai';
 
         var container = document.getElementById('modal-list-siswa');
@@ -359,7 +373,6 @@
 
         siapkanBaseModal();
         
-        // Kembalikan judul utama menjadi Input Nilai
         if (modalTitle) modalTitle.textContent = 'Form Input Nilai';
 
         var container = document.getElementById('modal-list-siswa');

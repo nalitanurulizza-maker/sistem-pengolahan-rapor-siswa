@@ -39,7 +39,7 @@ Route::middleware(['auth', 'role:admin'])
         // Halaman Dashboard Utama Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard-admin');
         
-       // ── KELOLA DATA MASTER ADMIN ─────────────────────────────────────────
+        // ── KELOLA DATA MASTER ADMIN ─────────────────────────────────────────
         // Manajemen Data Master Siswa
         Route::get('/data-siswa', [SiswaController::class, 'index'])->name('data-siswa');
         Route::post('/data-siswa', [SiswaController::class, 'store'])->name('siswa.store');
@@ -63,15 +63,17 @@ Route::middleware(['auth', 'role:guru,walas'])
     ->name('guru.')
     ->group(function () {
         
-        // Fitur Utama Dashboard & Monitoring Nilai
+        // Fitur Utama Dashboard 
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard-guru');
+        
+        // Fitur Cek Kelengkapan Nilai (Mendukung GET request AJAX untuk status kelengkapan 3 nilai)
         Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('cek-nilai');
 
-        // Fitur Input Nilai (GET untuk Tampilan & AJAX, POST untuk Simpan Masal dari Modal)
+        // Fitur Pengisian Nilai (GET untuk view tabel & data AJAX, POST untuk eksekusi Batch Model Eloquent)
         Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
         Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');
 
-        // Fitur Manajemen Wali Kelas & Guru (Dibuka akses dasarnya agar dikontrol via Blade @if)
+        // Fitur Manajemen Khusus Wali Kelas & Guru Terkait
         Route::get('/input-kehadiran', [GuruDashboardController::class, 'inputKehadiran'])->name('input-kehadiran');
         Route::get('/input-catatan', [GuruDashboardController::class, 'inputCatatan'])->name('input-catatan');
         Route::get('/input-predikat', [GuruDashboardController::class, 'inputPredikat'])->name('input-predikat');

@@ -34,4 +34,10 @@ public function kelas()
     // Parameter 3: Primary Key di tabel kelas (kode_kelas)
     return $this->belongsTo(Kelas::class, 'kode_kelas', 'kode_kelas');
 }
+
+// Cari fungsi nilai() di dalam class Siswa.php Anda, lalu ganti menjadi:
+public function nilai()
+{
+    return $this->hasMany(\App\Models\Guru\Nilai::class, 'nis', 'nis');
+}
 }
