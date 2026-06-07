@@ -8,12 +8,12 @@ use App\Models\Admin\Guru;
 
 class GuruController extends Controller
 {
-    // 1. READ: Menampilkan semua data guru ke tabel
+    // 1. READ: Menampilkan semua data guru ke tabel (Dilengkapi Eager Loading Relasi)
     public function index(Request $request)
     {
-        $data_guru = Guru::all();
+        // Mengambil data guru sekalian mengecek ke tabel kelas
+        $data_guru = Guru::with('kelas')->get();
 
-        // Mengambil data tunggal guru jika tombol edit diklik
         $guru_edit = null;
         if ($request->has('edit_nip')) {
             $guru_edit = Guru::where('nip', $request->edit_nip)->first();

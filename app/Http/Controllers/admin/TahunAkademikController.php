@@ -11,8 +11,6 @@ class TahunAkademikController extends Controller
 {
     public function index()
     {
-        // Mengambil semua baris data tahun akademik dari database phpMyAdmin
-        // Menggunakan pengaman class_exists agar jika model belum siap/migrasi kosong, halaman TIDAK AKAN CRASH
         $data = class_exists('App\Models\Admin\TahunAkademik') ? TahunAkademik::all() : collect();
 
         // Mengirimkan variabel $data ke file Blade index di dalam folder admin/tahun-akademik/

@@ -15,14 +15,23 @@ class Guru extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    // SINKRONISASI: Daftarkan semua kolom database dengan benar di sini
     protected $fillable = [
         'nip',
         'nama_guru',
-        'tgl_lahir',      // 👈 Diizinkan masuk
-        'no_telp',        // 👈 Nama disamakan dengan database asli kelompokmu
-        'jenis_kelamin',  // 👈 Diizinkan masuk
-        'alamat',         // 👈 Diizinkan masuk
-        'role'            // 👈 Diizinkan masuk
+        'tgl_lahir',      
+        'no_telp',        
+        'jenis_kelamin',  
+        'alamat',         
+        'role'            
     ];
+
+    /**
+     * Relasi ke tabel Kelas (Cek apakah guru ini dialokasikan sebagai Wali Kelas)
+     */
+    public function kelas()
+    {
+        // Parameter 2: Nama kolom Foreign Key yang berada di tabel kelas (nip_guru)
+        // Parameter 3: Nama kolom Primary Key yang berada di tabel guru (nip)
+        return $this->hasOne(Kelas::class, 'nip_guru', 'nip');
+    }
 }

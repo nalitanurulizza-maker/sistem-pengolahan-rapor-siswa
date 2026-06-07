@@ -30,22 +30,25 @@
                 <i class="fa-solid fa-house w-5"></i> Dashboard
             </a>
 
-            <div x-data="{ open: {{ request()->is('admin/data-*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
-                    <span class="flex items-center">
-                        <i class="fa-solid fa-database w-5"></i> Data Master
-                    </span>
-                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
-                </button>
-                <div x-show="open" x-cloak class="bg-black/10 pb-2">
-                    <a href="{{ route('admin.data-siswa') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-siswa') ? 'text-blue-300 font-bold' : '' }}">
-                        + Data Siswa
-                    </a>
-                    <a href="{{ route('admin.data-guru') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-guru') ? 'text-blue-300 font-bold' : '' }}">
-                        + Data Guru
-                    </a>
-                </div>
-            </div>
+           <div x-data="{ open: {{ request()->is('admin/data-*') ? 'true' : 'false' }} }">
+    <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
+        <span class="flex items-center">
+            <i class="fa-solid fa-database w-5"></i> Data Master
+        </span>
+        <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+    </button>
+    <div x-show="open" x-cloak class="bg-black/10 pb-2">
+        <a href="{{ route('admin.data-siswa') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-siswa') ? 'text-blue-300 font-bold' : '' }}">
+            + Data Siswa
+        </a>
+        <a href="{{ route('admin.data-guru') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-guru') ? 'text-blue-300 font-bold' : '' }}">
+            + Data Guru
+        </a>
+        <a href="{{ route('admin.data-kelas') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-kelas') ? 'text-blue-300 font-bold' : '' }}">
+            + Data Kelas
+        </a>
+    </div>
+</div>
 
             <div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/tahun-*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">

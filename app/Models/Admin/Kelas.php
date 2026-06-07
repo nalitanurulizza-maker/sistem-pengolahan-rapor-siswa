@@ -11,7 +11,6 @@ class Kelas extends Model
 
     protected $table = 'kelas';
     
-    // SESUAIKAN DENGAN GAMBAR PHP_MY_ADMIN:
     protected $primaryKey = 'kode_kelas'; 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -19,16 +18,23 @@ class Kelas extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'kode_kelas', // pastikan ini masuk fillable jika diinput manual
+        'kode_kelas', 
         'nama_kelas',
-        'tahun_ajaran' // disesuaikan dengan kolom di gambar kamu
+        'tahun_ajaran',
+        'nip_guru' // 🟢 Ganti guru_id menjadi nip_guru sesuai phpMyAdmin
     ];
 
     // Relasi ke tabel siswa
     public function siswa()
     {
-        // Parameter 2: Foreign Key di tabel siswa (kode_kelas)
-        // Parameter 3: Primary Key di tabel kelas (kode_kelas)
         return $this->hasMany(Siswa::class, 'kode_kelas', 'kode_kelas');
+    }
+
+    // Relasi ke tabel guru
+    public function guru()
+    {
+        // Parameter 2: Foreign Key di tabel kelas adalah 'nip_guru'
+        // Parameter 3: Primary Key di tabel guru (pastikan di tabel guru kolomnya namanya 'nip')
+        return $this->belongsTo(Guru::class, 'nip_guru', 'nip'); 
     }
 }

@@ -28,7 +28,7 @@
                         <th class="p-3 text-center w-[12%]">L/P</th>
                         <th class="p-3 text-left w-[15%] lg:table-cell hidden">Tgl Lahir</th>
                         <th class="p-3 text-left w-[22%] md:table-cell hidden">Alamat</th>
-                        <th class="p-3 text-center w-[10%] sm:table-cell hidden">Role</th>
+                        <th class="p-3 text-center w-[12%] sm:table-cell hidden">Role</th>
                         <th class="p-3 text-center w-[8%]">Aksi</th>
                     </tr>
                 </thead>
@@ -56,9 +56,15 @@
                         </td>
                         
                         <td class="p-3 text-center sm:table-cell hidden">
-                            <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
-                                {{ $guru->role == 'Walas' ? 'Wali Kelas' : 'Guru Mapel' }}
-                            </span>
+                            @if($guru->kelas)
+                                <span class="bg-green-50 text-green-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap border border-green-100">
+                                    Wali Kelas
+                                </span>
+                            @else
+                                <span class="bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap border border-blue-100">
+                                    Guru Mapel
+                                </span>
+                            @endif
                         </td>
                         
                         <td class="p-3 text-center">
@@ -144,7 +150,7 @@
                                 <input type="text" name="no_telp" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
+                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan Default</label>
                                 <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
                                     <option value="">-- Pilih Role --</option>
                                     <option value="Guru">Guru Mata Pelajaran</option>
@@ -215,7 +221,7 @@
                                 <input type="text" name="no_telp" value="{{ $guru_edit->no_telp }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan</label>
+                                <label class="block text-sm font-medium text-gray-700">Role / Jabatan Default</label>
                                 <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm bg-white">
                                     <option value="Guru" {{ $guru_edit->role == 'Guru' ? 'selected' : '' }}>Guru Mata Pelajaran</option>
                                     <option value="Walas" {{ $guru_edit->role == 'Walas' ? 'selected' : '' }}>Wali Kelas</option>
