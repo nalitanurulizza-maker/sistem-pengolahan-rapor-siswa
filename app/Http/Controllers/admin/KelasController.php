@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\Kelas; 
 use App\Models\Admin\Guru; 
+use Illuminate\Database\UniqueConstraintViolationException; 
 
 class KelasController extends Controller
 {
     public function index()
     {
-        $kelas = Kelas::with('guru')->get();
+        $kelas = Kelas::with('guru')->paginate(10);
         $gurus = Guru::all(); 
         
         return view('admin.data-kelas', compact('kelas', 'gurus'));
@@ -19,7 +20,6 @@ class KelasController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi disesuaikan menggunakan nip_guru
         $request->validate([
             'nama_kelas' => 'required|string',
             'nip_guru'   => 'required', 
@@ -27,14 +27,18 @@ class KelasController extends Controller
 
         $kodeKelas = str_replace(' ', '', $request->nama_kelas);
 
-        Kelas::create([
-            'kode_kelas'   => $kodeKelas,
-            'nama_kelas'   => $request->nama_kelas,
-            'nip_guru'     => $request->nip_guru, // 🟢 Simpan ke kolom nip_guru
-            'tahun_ajaran' => '2026/2027' 
-        ]);
-
-        return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil ditambahkan!');
+        try {
+            Kelas::create([
+                'kode_kelas'   => $kodeKelas,
+                'nama_kelas'   => $request->nama_kelas,
+                'nip_guru'     => $request->nip_guru, 
+                'tahun_ajaran' => '2026/2027' 
+            ]);
+            return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil ditambahkan!');
+        } catch (UniqueConstraintViolationException $e) {
+            // Jika guru sudah dipakai, kembalikan ke halaman sebelumnya dengan pesan error
+            return redirect()->back()->withInput()->withErrors(['nip_guru' => 'Guru tersebut sudah menjadi Wali Kelas di kelas lain!']);
+        }
     }
 
     public function update(Request $request, $kode_kelas)
@@ -45,12 +49,17 @@ class KelasController extends Controller
         ]);
 
         $kelas = Kelas::where('kode_kelas', $kode_kelas)->firstOrFail();
-        $kelas->update([
-            'nama_kelas' => $request->nama_kelas,
-            'nip_guru'   => $request->nip_guru, // 🟢 Update kolom nip_guru
-        ]);
 
-        return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil diperbarui!');
+        try {
+            $kelas->update([
+                'nama_kelas' => $request->nama_kelas,
+                'nip_guru'   => $request->nip_guru, 
+            ]);
+            return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil diperbarui!');
+        } catch (UniqueConstraintViolationException $e) {
+            // pesan error jika guru sudah menjadi walikelas di kelas lain
+            return redirect()->back()->withInput()->withErrors(['nip_guru' => 'Gagal memperbarui! Guru tersebut sudah menjadi Wali Kelas di kelas lain!']);
+        }
     }
 
     public function destroy($kode_kelas)

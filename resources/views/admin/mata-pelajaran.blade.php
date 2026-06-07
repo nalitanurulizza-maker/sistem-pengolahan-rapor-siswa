@@ -3,13 +3,33 @@
 @section('title', 'Data Mata Pelajaran')
 
 @section('content')
-<div x-data="{ openTambah: false }">
+{{-- Inisialisasi state Alpine.js untuk menangkap baris data yang akan diedit --}}
+<div x-data="{ openTambah: false, openEdit: false, editKodeMp: '', editNamaMp: '' }">
 
     <div class="p-4 sm:p-6">
         <h2 class="text-xl font-bold mb-4 text-gray-800">DATA MATA PELAJARAN</h2>
 
+        @if($errors->any())
+            <div class="mb-4 p-4 text-sm text-red-700 bg-red-50 rounded-xl border border-red-100 flex flex-col gap-1.5 shadow-sm">
+                @foreach ($errors->all() as $error)
+                    <div class="flex items-center gap-2 font-semibold">
+                        <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                        <span>{{ $error }}</span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+
+        @if(session('success'))
+            <div class="mb-4 p-4 text-sm text-green-700 bg-green-50 rounded-xl border border-green-100 flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-circle-check text-green-500 text-base"></i>
+                <span class="font-semibold">{{ session('success') }}</span>
+            </div>
+        @endif
+
         <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
+            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl shadow transition text-sm font-semibold">
                 + Tambah Mata Pelajaran
             </button>
         </div>
@@ -20,102 +40,133 @@
                     <tr>
                         <th class="p-3 text-center w-[8%]">No</th>
                         <th class="p-3 text-left w-[25%]">Kode Mapel</th>
-                        <th class="p-3 text-left w-[44%]">Nama Mata Pelajaran</th>
-                        <th class="p-3 text-center w-[15%] sm:table-cell hidden">Kelompok</th>
-                        <th class="p-3 text-center w-[8%]">Aksi</th>
+                        <th class="p-3 text-left w-[52%]">Nama Mata Pelajaran</th>
+                        <th class="p-3 text-center w-[15%]">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-50">
+                    {{-- Loop disesuaikan dengan variabel $data_mapel dari Controller --}}
+                    @forelse($data_mapel as $index => $mp)
                     <tr class="hover:bg-gray-50/70 transition">
-                        <td class="p-3 text-center">1</td>
-                        
-                        <td class="p-3">
-                            <span class="block font-mono text-blue-600 font-semibold uppercase">MP001</span>
+                      
+                        <td class="p-3 text-center">
+                            {{ method_exists($data_mapel, 'firstItem') ? $data_mapel->firstItem() + $index : $index + 1 }}
                         </td>
                         
                         <td class="p-3">
-                            <span class="block font-semibold text-gray-900 truncate" title="Matematika (Wajib)">Matematika (Wajib)</span>
-                            <!-- Info kelompok muncul di bawah nama mapel khusus layar HP -->
-                            <span class="inline-block sm:hidden text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-semibold mt-1">
-                                Kelompok A
-                            </span>
+                            <span class="block font-mono text-blue-600 font-semibold uppercase">{{ $mp->kode_mp }}</span>
                         </td>
                         
-                        <td class="p-3 text-center sm:table-cell hidden">
-                            <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap">
-                                Kelompok A
-                            </span>
+                        <td class="p-3">
+                            <span class="block font-semibold text-gray-900 truncate" title="{{ $mp->nama_mp }}">{{ $mp->nama_mp }}</span>
                         </td>
                         
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                                {{-- Oper data ke Alpine.js saat tombol edit diklik --}}
+                                <button @click="openEdit = true; editKodeMp = '{{ $mp->kode_mp }}'; editNamaMp = '{{ $mp->nama_mp }}'" 
+                                        title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
-                                <button title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
-                                    <i class="fa-solid fa-trash text-xs"></i>
-                                </button>
+
+                                {{-- Form Hapus Data --}}
+                                <form action="{{ route('admin.mata-pelajaran.destroy', $mp->kode_mp) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus mata pelajaran ini?')" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Hapus Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-gray-400 bg-gray-50/30 rounded-b-2xl">
+                            <i class="fa-solid fa-folder-open text-2xl mb-2 block text-gray-300"></i>
+                            Belum ada data mata pelajaran di dalam database.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <!-- MODAL TAMBAH MAPEL -->
-    <div x-show="openTambah" 
-         x-transition.opacity
-         class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-        
-        <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
-        
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all sm:w-full sm:max-w-xl">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Tambah Mata Pelajaran</h3>
-                    
-                    <form action="#" method="POST" class="space-y-4">
-                        @csrf
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Kode Mapel</label>
-                                <input type="text" name="kode_mapel" required placeholder="Contoh: MTK-01"
-                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-gray-400">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Kelompok</label>
-                                <select name="kelompok" required 
-                                        class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
-                                    <option value="">-- Pilih Kelompok --</option>
-                                    <option value="Kelompok A">Kelompok A (Wajib)</option>
-                                    <option value="Kelompok B">Kelompok B (Wajib)</option>
-                                    <option value="Kelompok C">Kelompok C (Peminatan)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Mata Pelajaran</label>
-                            <input type="text" name="nama_mapel" required 
-                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-
-                        <div class="mt-8 flex justify-end gap-3">
-                            <button @click="openTambah = false" type="button" 
-                                    class="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-                                Batal
-                            </button>
-                            <button type="submit" 
-                                    class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition">
-                                Simpan
-                            </button>
-                        </div>
-                    </form>
+           
+            @if(method_exists($data_mapel, 'links'))
+                <div class="mt-4 px-2">
+                    {{ $data_mapel->links() }}
                 </div>
-            </div>
+            @endif
         </div>
     </div>
+
+    <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+        <div @click.away="openTambah = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-lg border border-gray-100">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900">Tambah Mata Pelajaran</h3>
+                <button @click="openTambah = false" class="text-gray-400 hover:text-gray-600 transition text-sm p-1.5 hover:bg-gray-50 rounded-lg">✕</button>
+            </div>
+            
+            <form action="{{ route('admin.mata-pelajaran.store') }}" method="POST" class="p-6 space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kode Mapel</label>
+                    <input type="text" name="kode_mp" required placeholder="Contoh: MP001"
+                           class="mt-1 block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-sm placeholder:text-gray-400 text-gray-700 font-mono uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Mata Pelajaran</label>
+                    <input type="text" name="nama_mp" required placeholder="Contoh: Matematika"
+                           class="mt-1 block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-sm text-gray-700">
+                </div>
+
+                <div class="mt-8 flex justify-end gap-2.5 pt-4 border-t border-gray-50">
+                    <button @click="openTambah = false" type="button" class="px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 text-xs font-bold transition uppercase tracking-wider">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs font-bold transition shadow-sm shadow-blue-500/20 uppercase tracking-wider">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="openEdit" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+        <div @click.away="openEdit = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-lg border border-gray-100">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900">Ubah Mata Pelajaran</h3>
+                <button @click="openEdit = false" class="text-gray-400 hover:text-gray-600 transition text-sm p-1.5 hover:bg-gray-50 rounded-lg">✕</button>
+            </div>
+            
+            <form :action="'{{ url('admin/mata-pelajaran') }}/' + editKodeMp" method="POST" class="p-6 space-y-4">
+                @csrf
+                @method('PUT')
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Kode Mapel (Kunci)</label>
+                    <input type="text" x-model="editKodeMp" disabled
+                           class="mt-1 block w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-sm font-mono text-gray-400 uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Mata Pelajaran</label>
+                    <input type="text" name="nama_mp" x-model="editNamaMp" required
+                           class="mt-1 block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-sm text-gray-700">
+                </div>
+
+                <div class="mt-8 flex justify-end gap-2.5 pt-4 border-t border-gray-50">
+                    <button @click="openEdit = false" type="button" class="px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 text-xs font-bold transition uppercase tracking-wider">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs font-bold transition shadow-sm uppercase tracking-wider">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 @endsection
