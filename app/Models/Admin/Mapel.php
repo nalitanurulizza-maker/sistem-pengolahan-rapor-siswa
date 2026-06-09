@@ -9,15 +9,19 @@ class Mapel extends Model
 {
     use HasFactory;
 
-    protected $table = 'mata_pelajaran'; // Sesuaikan dengan nama tabel mata pelajaran Anda di phpMyAdmin
-    protected $primaryKey = 'kode_mapel'; // Sesuai kolom Primary Key yang Anda buat
+    // 🟢 SINKRONISASI DENGAN DATABASE ASLI (image_4dbec7.jpg)
+    protected $table = 'mata_pelajaran'; 
+    protected $primaryKey = 'kode_mp'; 
+    
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
 
+    /**
+     * Kolom yang diizinkan untuk diisi secara massal (Mass Assignment)
+     */
     protected $fillable = [
-        'kode_mapel',
-        'nama_mapel',
-        'kelompok'
+        'kode_mp',   // Sesuai kolom database phpMyAdmin
+        'nama_mp',   // Sesuai kolom database phpMyAdmin
     ];
 }

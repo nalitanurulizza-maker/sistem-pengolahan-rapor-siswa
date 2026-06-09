@@ -11,9 +11,10 @@ class TahunAkademikController extends Controller
 {
     public function index()
     {
-        $data = class_exists('App\Models\Admin\TahunAkademik') ? TahunAkademik::all() : collect();
+        // 🟢 PERBAIKAN 1: Menggunakan paginate(10) agar data rapi dibatasi per halaman
+        $data_tahun = class_exists('App\Models\Admin\TahunAkademik') ? TahunAkademik::paginate(10) : collect();
 
-        // Mengirimkan variabel $data ke file Blade index di dalam folder admin/tahun-akademik/
-        return view('admin.tahun-akademik.index', compact('data'));
+        // 🟢 PERBAIKAN 2: Diarahkan langsung ke file 'admin.tahun-akademik' (bukan sub-folder .index)
+        return view('admin.tahun-akademik', compact('data_tahun'));
     }
 }

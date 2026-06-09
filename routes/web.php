@@ -41,8 +41,22 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/data-guru/{nip}', [GuruController::class, 'update'])->name('guru.update');
         Route::delete('/data-guru/{nip}', [GuruController::class, 'destroy'])->name('guru.destroy');
 
+<<<<<<< HEAD
+=======
+        // ── DATA MASTER AKADEMIK - MATA PELAJARAN ────────────────
+        // Mengamankan pemanggilan nama rute lama di internal link view kelompokmu
+>>>>>>> 225e8d7825e79a0df02eb7d6ed78af5ca54e2a9a
         Route::get('/mata-pelajaran', [MapelController::class, 'index'])->name('mata-pelajaran');
+        Route::get('/data-mata-pelajaran', [MapelController::class, 'index'])->name('data-mata-pelajaran');
+        Route::post('/mata-pelajaran', [MapelController::class, 'store'])->name('mata-pelajaran.store');
+        Route::put('/mata-pelajaran/{kode_mp}', [MapelController::class, 'update'])->name('mata-pelajaran.update');
+        Route::delete('/mata-pelajaran/{kode_mp}', [MapelController::class, 'destroy'])->name('mata-pelajaran.destroy');
+        
+        // Data Master Akademik - Tahun Akademik 
         Route::get('/tahun-akademik', [TahunAkademikController::class, 'index'])->name('tahun-akademik');
+        Route::post('/tahun-akademik', [TahunAkademikController::class, 'store'])->name('tahun-akademik.store');
+        Route::patch('/tahun-akademik/{id}/aktifkan', [TahunAkademikController::class, 'aktifkan'])->name('tahun-akademik.aktifkan');
+        Route::delete('/tahun-akademik/{id}', [TahunAkademikController::class, 'destroy'])->name('tahun-akademik.destroy');
     });
 
 // Guru & Wali Kelas Routes

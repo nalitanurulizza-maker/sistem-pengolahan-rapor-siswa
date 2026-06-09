@@ -6,6 +6,25 @@
     <div class="p-4 sm:p-6">
         <h2 class="text-xl font-bold mb-4 text-gray-800">DATA KELAS</h2>
 
+        @if($errors->any())
+            <div class="mb-4 p-4 text-sm text-red-700 bg-red-50 rounded-xl border border-red-100 flex flex-col gap-1.5 shadow-sm">
+                @foreach ($errors->all() as $error)
+                    <div class="flex items-center gap-2 font-semibold">
+                        <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
+                        <span>{{ $error }}</span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- NOTIFIKASI SUKSES --}}
+        @if(session('success'))
+            <div class="mb-4 p-4 text-sm text-green-700 bg-green-50 rounded-xl border border-green-100 flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-circle-check text-green-500 text-base"></i>
+                <span class="font-semibold">{{ session('success') }}</span>
+            </div>
+        @endif
+
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <label class="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Pilih Kelas:</label>
@@ -24,13 +43,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mb-4 p-4 text-sm text-green-700 bg-green-50 rounded-xl border border-green-100 flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-green-500"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
             <table class="w-full table-fixed text-sm">
                 <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
@@ -45,7 +57,7 @@
                 <tbody class="text-gray-700 divide-y divide-gray-50">
                     @forelse($kelas as $index => $k)
                         <tr x-show="filterKelas === '' || filterKelas === '{{ $k->nama_kelas }}'" x-transition class="hover:bg-gray-50/70 transition">
-                            <td class="p-3 text-center">{{ $index + 1 }}</td>
+                            <td class="p-3 text-center">{{ $kelas->firstItem() + $index }}</td>
                             <td class="p-3 font-bold text-gray-900">{{ $k->nama_kelas }}</td>
                             <td class="p-3">
                                 @if($k->guru)
@@ -82,6 +94,10 @@
                     @endforelse
                 </tbody>
             </table>
+
+            <div class="mt-4 px-2">
+                {{ $kelas->links() }}
+            </div>
         </div>
     </div>
 
