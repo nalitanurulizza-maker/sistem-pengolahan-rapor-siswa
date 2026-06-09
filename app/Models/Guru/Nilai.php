@@ -27,9 +27,6 @@ class Nilai extends Model
         'tahun_ajaran'
     ];
 
-    /**
-     * Relasi Balik ke Siswa
-     */
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'nis', 'nis');

@@ -11,214 +11,139 @@ use App\Models\Guru\Nilai;
 
 class GuruDashboardController extends Controller
 {
-   
+    private function getGuruAktif()
+    {
+        $user = Auth::user();
+        $data = DB::table('guru')->where('nip', $user->username)->first() 
+                ?? (object) ['nama_guru' => $user->name, 'role' => 'guru', 'nip' => $user->username];
+
+        $cekWalas = DB::table('kelas')->where('nip_guru', $data->nip)->first();
+        $data->role = $cekWalas ? 'wali kelas' : 'guru';
+        $data->nama_kelas_walas = $cekWalas ? $cekWalas->nama_kelas : '-';
+        return $data;
+    }
+
     public function index()
     {
-        $user = Auth::user();
-
-        $jumlahMapel     = DB::table('mata_pelajaran')->count() ?: 0;
-        $jumlahSiswa     = Siswa::count() ?: 0; // Bermigrasi ke Model Siswa
-        $nilaiSudahInput = Nilai::whereNotNull('nilai_akhir')->count() ?: 0; // Bermigrasi ke Model Nilai
-        $totalTarget     = $jumlahSiswa * ($jumlahMapel ?: 1);
-        $nilaiBelumInput = max(0, $totalTarget - $nilaiSudahInput);
-
-        $rekapData = [
-            'jumlahMapel'     => $jumlahMapel,
-            'jumlahSiswa'     => $jumlahSiswa,
-            'nilaiSudahInput' => $nilaiSudahInput,
-            'nilaiBelumInput' => $nilaiBelumInput,
-        ];
-
-        $cekTahun = DB::table('tahun_akademik')->where('status', 'Aktif')->first()
-                 ?? DB::table('tahun_akademik')->first();
-
-        $tahunAkademik = (object) [
-            'nama_tahun' => $cekTahun ? $cekTahun->nama_tahun : '2025/2026',
-            'semester'   => $cekTahun ? $cekTahun->semester   : 'Genap',
-        ];
-
-        $namaKelas = '-';
-        $userRole  = strtolower($user->role ?? '');
-
-        // Pencarian data guru aktif berdasarkan Auth User Name
-        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
+        $data_guru_aktif = $this->getGuruAktif();
+        $plotMengajar = DB::table('plot_guru')->where('nip', $data_guru_aktif->nip)->get();
+        $kelasDiampu = $plotMengajar->pluck('kode_kelas')->unique()->toArray();
         
-        // SOLUSI AMAN: Jika data nama tidak sinkron antar-tabel, buat fallback objek agar sidebar tidak hilang/crash
-        if (!$data_guru_aktif) {
-            $data_guru_aktif = (object) [
-                'nama_guru' => $user->name,
-                'role'      => $user->role ?? 'guru',
-                'nip'       => '-'
-            ];
-        }
+        $rekapData = [
+            'jumlahMapel'     => $plotMengajar->unique('kode_mp')->count(),
+            'jumlahSiswa'     => DB::table('siswa')->whereIn('kode_kelas', $kelasDiampu)->count(),
+            'nilaiSudahInput' => Nilai::whereIn('kode_mp', $plotMengajar->pluck('kode_mp'))->whereNotNull('nilai_akhir')->count() ?: 0,
+            'nilaiBelumInput' => 0 
+        ];
 
-        $userRole = strtolower($data_guru_aktif->role ?? $userRole);
-
-        if ($userRole === 'walas') {
-            $cekKelas  = DB::table('kelas')->first();
-            $namaKelas = $cekKelas ? $cekKelas->nama_kelas : 'Kelas X-A';
-        }
-
-        return view('guru.dashboard-guru', compact('rekapData', 'tahunAkademik', 'namaKelas', 'data_guru_aktif'));
+        return view('guru.dashboard-guru', compact('rekapData', 'data_guru_aktif'));
     }
 
-    /**
-     * PROSES FILTER DAN AMBIL DATA SISWA UNTUK INPUT NILAI (AJAX & VIEW)
-     */
+    // --- FITUR INPUT NILAI ---
     public function inputNilai(Request $request)
     {
-        $kelas          = DB::table('kelas')->get();
-        $mata_pelajaran = DB::table('mata_pelajaran')->get();
-
-        if ($request->has('kode_kelas')) {
-            $kode_kelas  = $request->kode_kelas;
-            $kode_mp     = $request->kode_mp;
-            $jenis_nilai = strtolower($request->jenis_nilai ?? '');
-
-            $kolomNilai = 'nilai_akhir';
-            if ($jenis_nilai === 'harian')  { $kolomNilai = 'nilai_harian'; }
-            elseif ($jenis_nilai === 'uts') { $kolomNilai = 'nilai_uts'; }
-            elseif ($jenis_nilai === 'uas') { $kolomNilai = 'nilai_uas'; }
-
-            // Menggunakan ELOQUENT MODEL: Menarik siswa aktif beserta relasi nilai spesifik mapel terkait
-            $siswa = Siswa::where('kode_kelas', $kode_kelas)
-                ->with(['nilai' => function ($query) use ($kode_mp) {
-                    $query->where('kode_mp', $kode_mp);
-                }])
-                ->orderBy('nama_siswa', 'asc')
-                ->get()
-                ->map(function ($s) use ($kolomNilai) {
-                    // Mapping data agar JSON output kompatibel penuh dengan skrip JavaScript di Blade bawaan
-                    $nilaiSiswa = $s->nilai->first();
-                    $s->nilai_sekarang = $nilaiSiswa ? $nilaiSiswa->$kolomNilai : null;
-                    return $s;
-                });
-
-            return response()->json($siswa);
+        $d = $this->getGuruAktif();
+        if ($request->ajax()) {
+            $kolom = ['harian' => 'nilai_harian', 'uts' => 'nilai_uts', 'uas' => 'nilai_uas'][$request->jenis_nilai] ?? 'nilai_akhir';
+            
+            return response()->json(Siswa::where('kode_kelas', $request->kode_kelas)
+                ->with(['nilai' => fn($q) => $q->where('kode_mp', $request->kode_mp)])
+                ->get()->map(fn($s) => [
+                    'nama_siswa' => $s->nama_siswa, 
+                    'nis' => $s->nis,
+                    'nilai_sekarang' => $s->nilai->first()?->$kolom
+                ]));
         }
-
-        $user = Auth::user();
-        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
         
-        if (!$data_guru_aktif) {
-            $data_guru_aktif = (object) ['nama_guru' => $user->name, 'role' => $user->role ?? 'guru', 'nip' => '-'];
-        }
-
-        return view('guru.input-nilai', compact('kelas', 'mata_pelajaran', 'data_guru_aktif'));
+        $plot = DB::table('plot_guru')->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
+                ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
+                ->where('plot_guru.nip', $d->nip)->get();
+                
+        return view('guru.input-nilai', [
+            'kelas' => $plot->unique('kode_kelas'), 
+            'mata_pelajaran' => $plot->unique('kode_mp'), 
+            'd' => $d
+        ]);
     }
 
-    /**
-     * AKSI SIMPAN DAN PEMBARUAN BATCH NILAI MENGGUNAKAN MODEL ELOQUENT
-     */
     public function simpanNilaiBatch(Request $request)
     {
-        $request->validate([
-            'kode_kelas'  => 'required',
-            'kode_mp'     => 'required',
-            'jenis_nilai' => 'required',
-            'nilai'       => 'nullable|array', 
-        ]);
-
-        $dataNilai = $request->nilai ?? [];
-        if ($request->has('nis') && empty($dataNilai)) {
-            $dataNilai = [$request->nis => null];
+        $kolom = ['harian' => 'nilai_harian', 'uts' => 'nilai_uts', 'uas' => 'nilai_uas'][$request->jenis_nilai] ?? 'nilai_akhir';
+        
+        foreach ($request->nilai as $nis => $val) {
+            Nilai::updateOrCreate(
+                ['nis' => $nis, 'kode_mp' => $request->kode_mp],
+                [$kolom => $val, 'tahun_ajaran' => '2026/2027']
+            );
         }
+        return back()->with('success', 'Nilai berhasil disimpan!');
+    }
 
-        if (!empty($dataNilai)) {
-            foreach ($dataNilai as $nis => $nilai_angka) {
-                
-                $kolomNilai = 'nilai_akhir';
-                if (strtolower($request->jenis_nilai) == 'harian')     { $kolomNilai = 'nilai_harian'; }
-                elseif (strtolower($request->jenis_nilai) == 'uts')    { $kolomNilai = 'nilai_uts'; }
-                elseif (strtolower($request->jenis_nilai) == 'uas')    { $kolomNilai = 'nilai_uas'; }
+    // --- FITUR ABSENSI & KEHADIRAN ---
+   public function simpanKehadiran(Request $request)
+{
+    foreach ($request->kehadiran as $nis => $status) {
+    
+        \App\Models\Guru\Absensi::updateOrCreate(
+            [
+                'nis' => $nis,
+                'tahun_ajaran' => '2026/2027' 
+            ],
+            [
+                'jenis_kehadiran' => $status
+            ]
+        );
+    }
 
-                // MENGGUNAKAN MODEL NILAI: Mencari baris record data nilai lama siswa
-                $exists = Nilai::where('nis', $nis)
-                    ->where('kode_mp', $request->kode_mp)
-                    ->first();
+    return redirect()->back()->with('success', 'Data kehadiran berhasil disimpan!');
+}
 
-                if ($exists) {
-                    $nilai_simpan = ($nilai_angka === null || $nilai_angka === '') ? null : $nilai_angka;
-                    
-                    // MENGGUNAKAN MODEL NILAI: Melakukan update record (Otomatis memanipulasi kolom updated_at)
-                    $exists->update([
-                        $kolomNilai => $nilai_simpan
-                    ]);
-                } else {
-                    if ($nilai_angka === null || $nilai_angka === '') continue;
-
-                    // MENGGUNAKAN MODEL NILAI: Melakukan insert data baru (Otomatis memanipulasi kolom created_at & updated_at)
-                    Nilai::create([
-                        'kode_nilai'   => 'NILAI-' . rand(1000, 9999) . '-' . $nis,
-                        'nis'          => $nis,
-                        'kode_mp'      => $request->kode_mp,
-                        $kolomNilai    => $nilai_angka,
-                        'tahun_ajaran' => '2025/2026',
-                    ]);
-                }
-            }
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'status'  => 'success', 
-                'message' => 'Data nilai berhasil diperbarui via Model Eloquent.'
+    public function simpanAbsensiSesi(Request $request)
+    {
+        foreach ($request->absensi as $nis => $status) {
+            DB::table('absensi')->insert([
+                'nis' => $nis, 
+                'jenis_kehadiran' => 'SESI:'.$request->kode_mp.':'.$status, 
+                'tahun_ajaran' => '2026/2027'
             ]);
         }
-
-        return redirect()->back()->with('success', 'Data nilai siswa berhasil diperbarui!');
+        return back()->with('success', 'Absensi sesi disimpan!');
     }
 
-    /**
-     * FITUR CEK STATUS KELENGKAPAN 3 NILAI MENGGUNAKAN MODEL ELOQUENT
-     */
-    public function cekNilai(Request $request) 
-    { 
-        $kelas          = DB::table('kelas')->get();
-        $mata_pelajaran = DB::table('mata_pelajaran')->get();
-
-        if ($request->has('kode_kelas')) {
-            $kode_kelas  = $request->kode_kelas;
-            $kode_mp     = $request->kode_mp;
-            $jenis_nilai = strtolower($request->jenis_nilai ?? '');
-
-            $kolomNilai = 'nilai_akhir';
-            if ($jenis_nilai === 'harian')  { $kolomNilai = 'nilai_harian'; }
-            elseif ($jenis_nilai === 'uts') { $kolomNilai = 'nilai_uts'; }
-            elseif ($jenis_nilai === 'uas') { $kolomNilai = 'nilai_uas'; }
-
-            // MENGGUNAKAN MODEL SISWA: Erat dengan Eager Loading menjamin query jauh lebih efisien & aman
-            $siswa = Siswa::where('kode_kelas', $kode_kelas)
-                ->with(['nilai' => function ($query) use ($kode_mp) {
-                    $query->where('kode_mp', $kode_mp);
-                }])
-                ->orderBy('nama_siswa', 'asc')
-                ->get()
-                ->map(function ($s) use ($kolomNilai) {
-                    $nilaiSiswa = $s->nilai->first();
-                    // Menyediakan semua field penentu indikator kelengkapan nilai (Harian, UTS, UAS) untuk JavaScript
-                    $s->nilai_sekarang = $nilaiSiswa ? $nilaiSiswa->$kolomNilai : null;
-                    $s->nilai_harian   = $nilaiSiswa ? $nilaiSiswa->nilai_harian : null;
-                    $s->nilai_uts      = $nilaiSiswa ? $nilaiSiswa->nilai_uts : null;
-                    $s->nilai_uas      = $nilaiSiswa ? $nilaiSiswa->nilai_uas : null;
-                    return $s;
-                });
-
-            return response()->json($siswa);
+    public function simpanRekapMingguan(Request $request)
+    {
+        foreach ($request->rekap as $nis => $status) {
+            DB::table('absensi')->updateOrInsert(
+                ['nis' => $nis, 'tahun_ajaran' => '2026/2027', 'jenis_kehadiran' => 'REKAP:'.$request->minggu_ke.':'.$status],
+                ['jenis_kehadiran' => 'REKAP:'.$request->minggu_ke.':'.$status]
+            );
         }
-
-        $user = Auth::user();
-        $data_guru_aktif = DB::table('guru')->where('nama_guru', $user->name)->first();
-        
-        if (!$data_guru_aktif) {
-            $data_guru_aktif = (object) ['nama_guru' => $user->name, 'role' => $user->role ?? 'guru', 'nip' => '-'];
-        }
-
-        return view('guru.cek-nilai', compact('kelas', 'mata_pelajaran', 'data_guru_aktif')); 
+        return back()->with('success', 'Rekap mingguan disimpan!');
     }
 
-    public function inputKehadiran() { return view('guru.input-kehadiran'); }
-    public function inputCatatan()   { return view('guru.input-catatan'); }
-    public function inputPredikat()  { return view('guru.input-predikat'); }
-    public function cetakRapor()     { return view('guru.cetak-rapor'); }
+    // --- FITUR CEK NILAI ---
+    public function cekNilai(Request $request)
+    {
+        $d = $this->getGuruAktif();
+        if ($request->ajax()) {
+            $kolom = ['harian' => 'nilai_harian', 'uts' => 'nilai_uts', 'uas' => 'nilai_uas'][$request->jenis_nilai] ?? 'nilai_akhir';
+            return response()->json(Siswa::where('kode_kelas', $request->kode_kelas)
+                ->with(['nilai' => fn($q) => $q->where('kode_mp', $request->kode_mp)])
+                ->get()->map(fn($s) => [
+                    'nama_siswa' => $s->nama_siswa, 'nis' => $s->nis, 'nisn' => $s->nisn ?? '-',
+                    'nilai_sekarang' => $s->nilai->first()?->$kolom,
+                    'nilai_harian' => $s->nilai->first()?->nilai_harian,
+                    'nilai_uts' => $s->nilai->first()?->nilai_uts,
+                    'nilai_uas' => $s->nilai->first()?->nilai_uas,
+                ]));
+        }
+        $plot = DB::table('plot_guru')->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
+                ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
+                ->where('plot_guru.nip', $d->nip)->get();
+        return view('guru.cek-nilai', [
+            'kelas' => $plot->unique('kode_kelas'), 
+            'mata_pelajaran' => $plot->unique('kode_mp'), 
+            'data_guru_aktif' => $d
+        ]); 
+    }
 }

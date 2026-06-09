@@ -12,7 +12,6 @@
 
 <div class="bg-white p-8 rounded-t-3xl shadow-sm border border-gray-100 mt-6 min-h-[calc(100vh-180px)] flex flex-col">
 
-    {{-- ── FILTER DROPDOWN ── --}}
     <div class="w-full space-y-4 mb-6">
         <div class="flex flex-col md:flex-row md:items-center gap-4">
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Kelas</label>
@@ -54,12 +53,10 @@
         </div>
     </div>
 
-    {{-- ── NOTIFIKASI SUKSES ── --}}
     <div id="notif-sukses-ajax" class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold flex items-center gap-2" style="display: none;">
         <i class="fa-solid fa-circle-check text-base"></i> <span id="text-notif">Data berhasil disimpan!</span>
     </div>
 
-    {{-- ── TOMBOL MASSAL ── --}}
     <div class="mb-6" id="wrapper-tombol-input" style="display:none;">
         <button type="button" id="btn-input-massal"
                 class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm transition text-sm flex items-center gap-2">
@@ -67,7 +64,6 @@
         </button>
     </div>
 
-    {{-- ── TABEL SISWA ── --}}
     <div class="overflow-x-auto border rounded-lg shadow-sm">
         <table class="w-full text-sm text-left border-collapse">
             <thead class="bg-gray-50 text-gray-700 font-bold border-b text-xs uppercase">
@@ -92,14 +88,12 @@
 
 </div>
 
-{{-- ── MODAL INPUT NILAI ── --}}
 <div id="overlay-modal"
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
 
     <div style="background:#fff; border-radius:16px; width:100%; max-width:680px; max-height:85vh;
                 display:flex; flex-direction:column; margin:1rem; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
 
-        {{-- Header Modal --}}
         <div style="background:#1a2340; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0;">
             <div>
                 <p id="modal-main-title" style="margin:0; color:#fff; font-weight:700; font-size:0.875rem; text-transform:uppercase; letter-spacing:0.05em;">
@@ -112,7 +106,6 @@
                     aria-label="Tutup modal">&times;</button>
         </div>
 
-        {{-- Body Modal --}}
         <form id="form-nilai" action="{{ route('guru.simpan-nilai-batch') }}" method="POST" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
             @csrf
             <input type="hidden" name="kode_kelas" id="hidden-kelas">
@@ -122,7 +115,6 @@
             <div id="modal-list-siswa" style="padding:1.5rem; overflow-y:auto; flex:1; background:#f9fafb;">
             </div>
 
-            {{-- Footer Modal --}}
             <div style="padding:1rem 1.5rem; background:#fff; border-top:1px solid #e5e7eb;
                         display:flex; justify-content:flex-end; gap:0.75rem; flex-shrink:0;">
                 <button type="button" id="btn-tutup-batal"
@@ -157,7 +149,6 @@
     var formNilai    = document.getElementById('form-nilai');
     var modalTitle   = document.getElementById('modal-main-title');
 
-    // ── 1. Pendeteksi Otomatis Jika Dialihkan dari Halaman Cek Nilai ──
     window.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var paramKelas = urlParams.get('kelas');
@@ -168,11 +159,10 @@
             selKelas.value = paramKelas;
             selMapel.value = paramMapel;
             selJenis.value = paramJenis;
-            onFilterChange(); // Langsung trigger pencarian ke database
+            onFilterChange();
         }
     });
 
-    // Saat dropdown diubah manual oleh pengguna
     [selKelas, selMapel, selJenis].forEach(function (el) {
         el.addEventListener('change', onFilterChange);
     });
@@ -210,7 +200,6 @@
             });
     }
 
-    // ── 2. Intersepsi Submit Form Modal dengan AJAX agar tidak reload/naik ke atas ──
     formNilai.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -248,7 +237,6 @@
         });
     });
 
-    // ── 3. Fungsi Hapus Tunggal via AJAX ──
     window.hapusNilaiSatuSiswa = function(nis, nama) {
         if (!confirm('Apakah Anda yakin ingin menghapus nilai untuk ' + nama + '?')) {
             return;
@@ -259,7 +247,7 @@
         formData.append('kode_mp', selMapel.value);
         formData.append('jenis_nilai', selJenis.value);
         formData.append('nis', nis);
-        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('_token', '{{ csrf_token() }}'); // FIX: Diapit dengan tanda kutip tunggal string JS
 
         fetch(formNilai.action, {
             method: 'POST',
@@ -325,9 +313,8 @@
         });
     }
 
-    // ── 4. Buka & tutup modal ──
     btnMassal.addEventListener('click', bukaModalMultiSiswa);
-    document.getElementById('btn-tutup-x').addEventListener('click',     tutupModal);
+    document.getElementById('btn-tutup-x').addEventListener('click',    tutupModal);
     document.getElementById('btn-tutup-batal').addEventListener('click', tutupModal);
 
     overlay.addEventListener('click', function (e) {
@@ -398,7 +385,7 @@
                           + 'padding:0.75rem 1rem;background:#fff;border:1px solid #f0f0f0;'
                           + 'border-radius:12px;margin-bottom:0.5rem;';
         row.innerHTML =
-              '<div style="flex:1;padding-right:1rem;">'
+             '<div style="flex:1;padding-right:1rem;">'
             +   '<p style="margin:0;font-weight:700;font-size:0.875rem;color:#1f2937;">' + esc(s.nama_siswa) + '</p>'
             +   '<p style="margin:0.15rem 0 0;font-size:0.7rem;color:#9ca3af;">NIS: ' + esc(s.nis || '-') + ' | NISN: ' + esc(s.nisn || '-') + '</p>'
             + '</div>'

@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // <-- 1. IMPORT INI WAJIB ADA
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable; // <-- 2. PASANG HASFACTORY DI SINI
+    use HasFactory, Notifiable; 
 
-    const ROLE_ADMIN = 'Admin';
-    const ROLE_GURU  = 'Guru';
-    const ROLE_WALAS = 'Walas';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_GURU  = 'guru';
+    const ROLE_WALAS = 'walas';
 
     protected $fillable = [
         'name',
@@ -32,15 +33,10 @@ class User extends Authenticatable
         'updated_at' => 'datetime',
     ];
 
-    // ── WAJIB DITAMBAHKAN ─────────────────────────────────────────────────────
-    /**
-     * Override default 'email' menjadi 'username' untuk Auth::attempt()
-     */
     public function getAuthIdentifierName(): string
     {
         return 'username';
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
     public function isAdmin(): bool
     {
@@ -54,16 +50,30 @@ class User extends Authenticatable
 
     public function isWalas(): bool
     {
-        return $this->role === self::ROLE_WALAS;
+        if ($this->role === self::ROLE_WALAS) {
+            return true;
+        }
+
+        if ($this->role === self::ROLE_GURU) {
+            return DB::table('kelas')->where('nip_guru', $this->username)->exists();
+        }
+
+        return false;
     }
 
     public function isPengajar(): bool
     {
-        return in_array($this->role, [self::ROLE_GURU, self::ROLE_WALAS]);
+        return in_array($this->role, [self::ROLE_GURU, self::ROLE_WALAS]) || $this->isWalas();
     }
 
     public function hasRole(string|array $roles): bool
     {
-        return in_array($this->role, (array) $roles);
+        $currentRole = $this->role;
+        
+        if ($currentRole === self::ROLE_GURU && $this->isWalas()) {
+            $currentRole = self::ROLE_WALAS;
+        }
+
+        return in_array($currentRole, (array) $roles);
     }
 }

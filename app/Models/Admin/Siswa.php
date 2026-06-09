@@ -27,17 +27,22 @@ class Siswa extends Model
         'no_telp_wali'
     ];
 
- // Relasi ke tabel kelas (Siswa berada di sebuah Kelas)
+
 public function kelas()
 {
-    // Parameter 2: Foreign Key di tabel siswa (kode_kelas)
-    // Parameter 3: Primary Key di tabel kelas (kode_kelas)
+    
     return $this->belongsTo(Kelas::class, 'kode_kelas', 'kode_kelas');
 }
 
-// Cari fungsi nilai() di dalam class Siswa.php Anda, lalu ganti menjadi:
 public function nilai()
 {
     return $this->hasMany(\App\Models\Guru\Nilai::class, 'nis', 'nis');
+}
+
+
+public function absensi()
+{
+    return $this->hasOne(\App\Models\Guru\Absensi::class, 'nis', 'nis')
+                ->where('tahun_ajaran', '2026/2027');
 }
 }
