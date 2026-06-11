@@ -27,8 +27,7 @@ class GuruSeeder extends Seeder
 
         for ($i = 1; $i <= 60; $i++) {
             $nip = 'G' . sprintf('%03d', $i);
-            
-            // Mengombinasikan nama secara matematis agar selalu dapat nama unik bervariasi
+        
             $nama_guru = $nama_depan[$i % count($nama_depan)] . ' ' . $nama_belakang[$i % count($nama_belakang)];
             $jk = ($i % 2 == 0) ? 'L' : 'P';
 
