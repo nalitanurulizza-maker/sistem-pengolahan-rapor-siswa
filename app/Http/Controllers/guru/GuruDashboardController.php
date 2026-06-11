@@ -80,6 +80,28 @@ class GuruDashboardController extends Controller
     }
 
     // --- FITUR ABSENSI & KEHADIRAN ---
+
+  public function inputKehadiran(Request $request)
+{
+    $d = $this->getGuruAktif();
+    
+    $plot = DB::table('plot_guru')->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
+            ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
+            ->where('plot_guru.nip', $d->nip)->get();
+
+    // Ambil data siswa (Contoh: ambil siswa dari kelas pertama yang diampu atau sesuai request)
+    $siswa = [];
+    if ($request->has('kode_kelas')) {
+        $siswa = Siswa::where('kode_kelas', $request->kode_kelas)->get();
+    }
+
+    return view('guru.input-kehadiran', [
+        'kelas' => $plot->unique('kode_kelas'), 
+        'mata_pelajaran' => $plot->unique('kode_mp'), 
+        'data_guru_aktif' => $d,
+        'siswa' => $siswa // Mengirim variabel $siswa ke view
+    ]);
+}
    public function simpanKehadiran(Request $request)
 {
     foreach ($request->kehadiran as $nis => $status) {
