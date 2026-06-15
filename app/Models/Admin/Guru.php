@@ -30,8 +30,7 @@ class Guru extends Model
      */
     public function kelas()
     {
-        // Parameter 2: Nama kolom Foreign Key yang berada di tabel kelas (nip_guru)
-        // Parameter 3: Nama kolom Primary Key yang berada di tabel guru (nip)
+       
         return $this->hasOne(Kelas::class, 'nip_guru', 'nip');
     }
 }

@@ -8,11 +8,9 @@ use App\Models\Admin\Guru;
 
 class GuruController extends Controller
 {
-    // 1. READ: Menampilkan semua data guru ke tabel (Dilengkapi Eager Loading Relasi)
     public function index(Request $request)
     {
-        // Mengambil data guru sekalian mengecek ke tabel kelas
-        $data_guru = Guru::with('kelas')->get();
+        $data_guru = Guru::with('kelas')->paginate(10);
 
         $guru_edit = null;
         if ($request->has('edit_nip')) {
@@ -22,7 +20,6 @@ class GuruController extends Controller
         return view('admin.data-guru', compact('data_guru', 'guru_edit'));
     }
 
-    // 2. CREATE: Menyimpan data guru baru
     public function store(Request $request)
     {
         $request->validate([
@@ -48,7 +45,6 @@ class GuruController extends Controller
         return redirect()->route('admin.data-guru')->with('success', 'Data guru berhasil ditambahkan!');
     }
 
-    // 3. UPDATE: Memperbarui data guru lama
     public function update(Request $request, $nip)
     {
         $request->validate([
@@ -72,7 +68,6 @@ class GuruController extends Controller
         return redirect()->route('admin.data-guru')->with('success', 'Data guru berhasil diperbarui!');
     }
 
-    // 4. DELETE: Menghapus data guru dari database
     public function destroy($nip)
     {
         Guru::where('nip', $nip)->delete();

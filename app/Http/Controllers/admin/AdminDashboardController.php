@@ -23,10 +23,7 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard-admin', compact('rekapData'));
     }
 
-    /**
-     * Fungsi pembantu untuk memeriksa keberadaan tabel sebelum menghitung total baris.
-     * Mencegah crash jika database belum di-migrate secara utuh di laptop tim.
-     */
+   
     private function checkTableAndCount(string $table): int
     {
         try {
@@ -34,7 +31,6 @@ class AdminDashboardController extends Controller
                 return DB::table($table)->count();
             }
         } catch (\Exception $e) {
-            // Mengembalikan angka 0 jika terjadi kendala koneksi atau tabel tidak ditemukan
         }
 
         return 0;

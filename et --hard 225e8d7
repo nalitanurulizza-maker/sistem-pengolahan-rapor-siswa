@@ -1,0 +1,46 @@
+[33m4fcacb2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: pull: Fast-forward
+[33m225e8d7[m HEAD@{1}: commit: update data akademik
+[33m938657b[m HEAD@{2}: commit: create data kelas dan update data guru
+[33m9710230[m HEAD@{3}: pull: Fast-forward
+[33m05f2edd[m HEAD@{4}: commit: update CRUD guru(admin)
+[33m18eb2a8[m HEAD@{5}: pull: Fast-forward
+[33m91eb388[m HEAD@{6}: pull: Fast-forward
+[33maa7640b[m HEAD@{7}: pull: Fast-forward
+[33m1a2e55c[m HEAD@{8}: commit: CRUD data siswa
+[33mb41adce[m HEAD@{9}: commit: create data siswa dan guru
+[33m35ca7bd[m HEAD@{10}: pull: Fast-forward
+[33m61f41f1[m HEAD@{11}: commit: benerin error session, update route admin, dan tampilin data guru dari db
+[33mf535168[m HEAD@{12}: commit: update frontend
+[33m3071eae[m HEAD@{13}: commit: update home
+[33m25507f8[m HEAD@{14}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33m6245ede[m HEAD@{15}: commit: update
+[33m1ad8bb5[m HEAD@{16}: reset: moving to HEAD~1
+[33m04e2462[m HEAD@{17}: reset: moving to HEAD~1
+[33m24b1402[m HEAD@{18}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33m04e2462[m HEAD@{19}: commit: update modal login
+[33m1ad8bb5[m HEAD@{20}: commit: update admin
+[33m456fe7e[m HEAD@{21}: commit: update walas
+[33m4d12e6a[m HEAD@{22}: pull: Fast-forward
+[33m16d409e[m HEAD@{23}: pull: Fast-forward
+[33m81db530[m HEAD@{24}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33m7003208[m HEAD@{25}: commit: add data guru
+[33m4c30cd1[m HEAD@{26}: commit: update
+[33m85634aa[m HEAD@{27}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33m80b62ce[m HEAD@{28}: commit: update
+[33mdf81318[m HEAD@{29}: pull: Fast-forward
+[33m733467b[m HEAD@{30}: pull: Fast-forward
+[33m98c27a2[m HEAD@{31}: commit: add data-siswa
+[33m0c71601[m HEAD@{32}: pull: Fast-forward
+[33m594daca[m HEAD@{33}: commit: update
+[33m366a1de[m HEAD@{34}: pull: Fast-forward
+[33me20d813[m HEAD@{35}: commit: update dashboard admin
+[33mf9e1f5e[m HEAD@{36}: commit (merge): Merge branch 'main' of https://github.com/nalitanurulizza-maker/sistem-pengolahan-rapor-siswa
+[33m51e7c9c[m HEAD@{37}: commit: update home and etc
+[33mc32064c[m HEAD@{38}: pull: Fast-forward
+[33m239af2a[m HEAD@{39}: commit: update Tailwind
+[33md01e675[m HEAD@{40}: commit: update routes
+[33mc64c260[m HEAD@{41}: commit: update contact controller
+[33me54320b[m HEAD@{42}: pull origin main: Fast-forward
+[33m6cc23ba[m HEAD@{43}: commit: update dashboard
+[33ma5645bc[m HEAD@{44}: commit: update dashboard
+[33m00f6870[m HEAD@{45}: commit (initial): update

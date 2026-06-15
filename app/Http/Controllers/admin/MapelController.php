@@ -8,12 +8,26 @@ use App\Models\Admin\Mapel;
 
 class MapelController extends Controller
 {
-   /**
-     * READ: Menampilkan semua data mata pelajaran ke tabel dengan batasan halaman.
+    /**
+     * READ: Menampilkan semua data mata pelajaran ke tabel dengan batasan halaman & filter pencarian.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data_mapel = class_exists('App\Models\Admin\Mapel') ? Mapel::paginate(10) : collect();
+        $search = $request->input('search');
+
+        if (class_exists('App\Models\Admin\Mapel')) {
+            $data_mapel = Mapel::query()
+                ->when($search, function ($query, $search) {
+                    return $query->where(function ($q) use ($search) {
+                        $q->where('kode_mp', 'LIKE', "%{$search}%")
+                          ->orWhere('nama_mp', 'LIKE', "%{$search}%");
+                    });
+                })
+                ->paginate(10);
+        } else {
+            $data_mapel = collect();
+        }
+
         return view('admin.mata-pelajaran', compact('data_mapel'));
     }
 

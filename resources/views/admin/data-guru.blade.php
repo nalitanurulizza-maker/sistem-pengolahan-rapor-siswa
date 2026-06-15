@@ -1,7 +1,7 @@
 @extends('layout.admin-app')
 
 @section('content')
-<div x-data="{ openTambah: false, openEdit: false }" 
+<div x-data="{ openTambah: @json($errors->any()), openEdit: false }" 
      x-init="@if(request()->has('edit_nip')) openEdit = true @endif">
 
     <div class="p-4 sm:p-6">
@@ -35,7 +35,7 @@
                 <tbody class="text-gray-700 divide-y divide-gray-50">
                     @forelse($data_guru as $index => $guru)
                     <tr class="hover:bg-gray-50/70 transition">
-                        <td class="p-3 text-center">{{ $index + 1 }}</td>
+                        <td class="p-3 text-center">{{ $data_guru->firstItem() + $index }}</td>
                         
                         <td class="p-3">
                             <span class="block font-semibold text-gray-900 truncate">{{ $guru->nama_guru }}</span>
@@ -95,6 +95,10 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-4 px-2">
+            {{ $data_guru->links() }}
+        </div>
     </div>
 
     <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
@@ -121,11 +125,11 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">NIP</label>
-                                <input type="text" name="nip" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nip" value="{{ old('nip') }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Nama Guru</label>
-                                <input type="text" name="nama_guru" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="nama_guru" value="{{ old('nama_guru') }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
@@ -134,34 +138,34 @@
                                 <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
                                 <select name="jenis_kelamin" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
-                                    <option value="L">Laki-laki</option>
-                                    <option value="P">Perempuan</option>
+                                    <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                                <input type="date" name="tgl_lahir" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="date" name="tgl_lahir" value="{{ old('tgl_lahir') }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                                <input type="text" name="no_telp" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="text" name="no_telp" value="{{ old('no_telp') }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Role / Jabatan Default</label>
                                 <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
                                     <option value="">-- Pilih Role --</option>
-                                    <option value="Guru">Guru Mata Pelajaran</option>
-                                    <option value="Walas">Wali Kelas</option>
+                                    <option value="Guru" {{ old('role') == 'Guru' ? 'selected' : '' }}>Guru Mata Pelajaran</option>
+                                    <option value="Walas" {{ old('role') == 'Walas' ? 'selected' : '' }}>Wali Kelas</option>
                                 </select>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                            <textarea name="alamat" rows="3" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+                            <textarea name="alamat" rows="3" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">{{ old('alamat') }}</textarea>
                         </div>
 
                         <div class="mt-8 flex justify-end gap-3">

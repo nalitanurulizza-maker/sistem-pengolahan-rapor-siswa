@@ -1,6 +1,6 @@
 @extends('layout.admin-app')
 
-@section('title', 'Tahun Akademik')
+@section('title', 'Tahun Academic')
 
 @section('content')
 <div x-data="{ openTambah: false }">
@@ -8,7 +8,6 @@
     <div class="p-4 sm:p-6">
         <h2 class="text-xl font-bold mb-4 text-gray-800">DATA TAHUN AKADEMIK</h2>
 
-        {{-- Notifikasi Error Validasi --}}
         @if($errors->any())
             <div class="mb-4 p-4 text-sm text-red-700 bg-red-50 rounded-xl border border-red-100 flex flex-col gap-1.5 shadow-sm">
                 @foreach ($errors->all() as $error)
@@ -20,7 +19,6 @@
             </div>
         @endif
 
-        {{-- Notifikasi Sukses --}}
         @if(session('success'))
             <div class="mb-4 p-4 text-sm text-green-700 bg-green-50 rounded-xl border border-green-100 flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-circle-check text-green-500 text-base"></i>
@@ -46,20 +44,18 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-50">
-                    {{-- Loop disesuaikan menggunakan variabel $data_tahun dari controller --}}
                     @forelse($data_tahun as $index => $ta)
                     <tr class="{{ $ta->status == 'Aktif' ? 'bg-blue-50/40 hover:bg-blue-50/70' : 'hover:bg-gray-50/70' }} transition">
                         
-                        {{-- Penomoran halaman berlanjut otomatis --}}
                         <td class="p-3 text-center">
                             {{ method_exists($data_tahun, 'firstItem') ? $data_tahun->firstItem() + $index : $index + 1 }}
                         </td>
                         
-                        <td class="p-3 text-center {{ $ta->status == 'Aktif' ? 'font-bold text-gray-900' : 'font-semibold text-gray-800' }}">
-                            {{ $ta->tahun_akademik }}
+                        <td class="p-3 text-center {{ $ta->status == 'Aktif' ? 'font-bold text-gray-900' : 'font-semibold text-gray-500' }}">
+                            {{ $ta->nama_tahun }}
                         </td>
                         
-                        <td class="p-3 text-center {{ $ta->status == 'Aktif' ? 'font-medium' : '' }}">
+                        <td class="p-3 text-center {{ $ta->status == 'Aktif' ? 'font-medium text-gray-900' : 'text-gray-500' }}">
                             {{ $ta->semester }}
                         </td>
                         
@@ -69,8 +65,8 @@
                                     <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Aktif
                                 </span>
                             @else
-                                <span class="inline-block px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                                    Tidak Aktif
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                                    <i class="fa-solid fa-box-archive text-[9px]"></i> Diarsipkan
                                 </span>
                             @endif
                         </td>
@@ -80,7 +76,6 @@
                                 @if($ta->status == 'Aktif')
                                     <span class="text-xs text-gray-400 font-medium select-none px-2 py-1">Active</span>
                                 @else
-                                    {{-- Form Aktifkan Periode (Mengubah status periode terpilih menjadi Aktif) --}}
                                     <form action="{{ route('admin.tahun-akademik.aktifkan', $ta->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
@@ -90,7 +85,6 @@
                                     </form>
                                 @endif
                                 
-                                {{-- Form Hapus Data --}}
                                 <form action="{{ route('admin.tahun-akademik.destroy', $ta->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus periode akademik ini?')" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -112,7 +106,6 @@
                 </tbody>
             </table>
 
-            {{-- Links Navigasi Halaman Pagination --}}
             @if(method_exists($data_tahun, 'links'))
                 <div class="mt-4 px-2">
                     {{ $data_tahun->links() }}
@@ -125,7 +118,7 @@
         <div @click.away="openTambah = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-md border border-gray-100">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6 border-b pb-2">
-                    <h3 class="text-xl font-bold text-gray-900">Tahun Academic Baru</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Tahun Akademik Baru</h3>
                     <button @click="openTambah = false" class="text-gray-400 hover:text-gray-600 text-sm">✕</button>
                 </div>
                 

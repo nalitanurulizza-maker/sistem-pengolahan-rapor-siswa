@@ -3,7 +3,6 @@
 @section('title', 'Data Mata Pelajaran')
 
 @section('content')
-{{-- Inisialisasi state Alpine.js untuk menangkap baris data yang akan diedit --}}
 <div x-data="{ openTambah: false, openEdit: false, editKodeMp: '', editNamaMp: '' }">
 
     <div class="p-4 sm:p-6">
@@ -28,11 +27,38 @@
             </div>
         @endif
 
-        <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl shadow transition text-sm font-semibold">
-                + Tambah Mata Pelajaran
-            </button>
+        {{-- Filter Pencarian & Tombol Tambah --}}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            {{-- Form Pencarian --}}
+            <form action="{{ request()->url() }}" method="GET" class="w-full sm:max-w-xs">
+                <div class="relative">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode atau nama mapel..."
+                           class="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-400 text-gray-700 shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </div>
+                    @if(request('search'))
+                        <a href="{{ request()->url() }}" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition text-sm" title="Reset Pencarian">
+                            ✕
+                        </a>
+                    @endif
+                </div>
+            </form>
+
+            {{-- Tombol Tambah --}}
+            <div class="flex justify-end">
+                <button @click="openTambah = true" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl shadow transition text-sm font-semibold whitespace-nowrap">
+                    + Tambah Mata Pelajaran
+                </button>
+            </div>
         </div>
+
+        {{-- Notifikasi Hasil Pencarian --}}
+        @if(request('search'))
+            <div class="mb-3 text-sm text-gray-500 flex items-center gap-1.5 pl-1">
+                <span>Hasil pencarian untuk: <strong class="text-gray-800">"{{ request('search') }}"</strong></span>
+            </div>
+        @endif
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
             <table class="w-full table-fixed text-sm">
@@ -45,7 +71,6 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-50">
-                    {{-- Loop disesuaikan dengan variabel $data_mapel dari Controller --}}
                     @forelse($data_mapel as $index => $mp)
                     <tr class="hover:bg-gray-50/70 transition">
                       
@@ -63,7 +88,6 @@
                         
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
-                                {{-- Oper data ke Alpine.js saat tombol edit diklik --}}
                                 <button @click="openEdit = true; editKodeMp = '{{ $mp->kode_mp }}'; editNamaMp = '{{ $mp->nama_mp }}'" 
                                         title="Ubah Data" class="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
                                     <i class="fa-solid fa-pen text-xs"></i>
@@ -93,12 +117,13 @@
            
             @if(method_exists($data_mapel, 'links'))
                 <div class="mt-4 px-2">
-                    {{ $data_mapel->links() }}
+                    {{ $data_mapel->appends(['search' => request('search')])->links() }}
                 </div>
             @endif
         </div>
     </div>
 
+    {{-- Modal Tambah --}}
     <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div @click.away="openTambah = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-lg border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
@@ -133,6 +158,7 @@
         </div>
     </div>
 
+    {{-- Modal Edit --}}
     <div x-show="openEdit" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div @click.away="openEdit = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-lg border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
