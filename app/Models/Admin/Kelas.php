@@ -21,7 +21,7 @@ class Kelas extends Model
         'kode_kelas', 
         'nama_kelas',
         'tahun_ajaran',
-        'nip_guru' // 🟢 Ganti guru_id menjadi nip_guru sesuai phpMyAdmin
+        'nip_guru' 
     ];
 
     // Relasi ke tabel siswa
@@ -33,8 +33,7 @@ class Kelas extends Model
     // Relasi ke tabel guru
     public function guru()
     {
-        // Parameter 2: Foreign Key di tabel kelas adalah 'nip_guru'
-        // Parameter 3: Primary Key di tabel guru (pastikan di tabel guru kolomnya namanya 'nip')
+    
         return $this->belongsTo(Guru::class, 'nip_guru', 'nip'); 
     }
 }

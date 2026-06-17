@@ -88,14 +88,15 @@
 
         </nav>
 
-        {{-- Tombol Logout POST --}}
-        <form method="POST" action="{{ route('logout') }}">
+         {{-- Form Logout  --}}
+        <form id="logout-form" method="POST" action="{{ route('logout') }}" x-data>
             @csrf
-            <button type="submit" class="w-full py-4 px-4 hover:bg-red-500 transition border-t border-white/10 mt-auto text-sm text-left text-white cursor-pointer">
+            <button type="button" 
+                    @click="if (confirm('Apakah Anda yakin ingin keluar?')) { $el.closest('form').submit(); }"
+                    class="w-full py-4 px-4 hover:bg-red-500 transition border-t border-white/10 mt-auto text-sm text-left text-white bg-transparent">
                 <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
             </button>
         </form>
-
     </aside>
 
     <div class="ml-[210px] flex-1 p-6 transition-all duration-300">

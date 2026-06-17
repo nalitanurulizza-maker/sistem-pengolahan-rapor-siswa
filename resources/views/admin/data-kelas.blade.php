@@ -101,6 +101,7 @@
         </div>
     </div>
 
+    {{-- MODAL TAMBAH DATA --}}
     <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div @click.away="openTambah = false" class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transition-all border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
@@ -120,7 +121,8 @@
                     <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Guru Pengajar / Wali Kelas</label>
                     <select name="nip_guru" required class="block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm text-sm transition focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-700">
                         <option value="" disabled selected>Pilih Guru</option>
-                        @foreach($gurus as $guru)
+                        {{-- Menggunakan $gurusTersedia agar yang sudah punya kelas langsung disembunyikan --}}
+                        @foreach($gurusTersedia as $guru)
                             <option value="{{ $guru->nip }}">{{ $guru->nama_guru }} ({{ $guru->nip ?? 'Tanpa NIP' }})</option>
                         @endforeach
                     </select>
@@ -138,6 +140,7 @@
         </div>
     </div>
 
+    {{-- MODAL EDIT DATA --}}
     <div x-show="openEdit" x-transition.opacity class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div @click.away="openEdit = false" class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transition-all border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
@@ -159,7 +162,15 @@
                     <select name="nip_guru" x-model="editNipGuru" required class="block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm text-sm transition focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-700">
                         <option value="" disabled>Pilih Guru</option>
                         @foreach($gurus as $guru)
-                            <option value="{{ $guru->nip }}">{{ $guru->nama_guru }} ({{ $guru->nip ?? 'Tanpa NIP' }})</option>
+                            {{-- Jika guru belum memiliki kelas, tampilkan secara normal --}}
+                            @if(!in_array($guru->nip, $nipGuruTerpakai))
+                                <option value="{{ $guru->nip }}">{{ $guru->nama_guru }} ({{ $guru->nip ?? 'Tanpa NIP' }})</option>
+                            @else
+                                {{-- Jika guru sudah punya kelas, hanya tampilkan jika NIP-nya cocok dengan wali kelas yang sedang diedit saat ini --}}
+                                <option value="{{ $guru->nip }}" x-show="editNipGuru === '{{ $guru->nip }}'">
+                                    {{ $guru->nama_guru }} ({{ $guru->nip ?? 'Tanpa NIP' }}) [Wali Kelas Saat Ini]
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>

@@ -30,25 +30,25 @@
                 <i class="fa-solid fa-house w-5"></i> Dashboard
             </a>
 
-           <div x-data="{ open: {{ request()->is('admin/data-*') ? 'true' : 'false' }} }">
-    <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
-        <span class="flex items-center">
-            <i class="fa-solid fa-database w-5"></i> Data Master
-        </span>
-        <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
-    </button>
-    <div x-show="open" x-cloak class="bg-black/10 pb-2">
-        <a href="{{ route('admin.data-siswa') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-siswa') ? 'text-blue-300 font-bold' : '' }}">
-            + Data Siswa
-        </a>
-        <a href="{{ route('admin.data-guru') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-guru') ? 'text-blue-300 font-bold' : '' }}">
-            + Data Guru
-        </a>
-        <a href="{{ route('admin.data-kelas') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-kelas') ? 'text-blue-300 font-bold' : '' }}">
-            + Data Kelas
-        </a>
-    </div>
-</div>
+            <div x-data="{ open: {{ request()->is('admin/data-*') ? 'true' : 'false' }} }">
+                <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
+                    <span class="flex items-center">
+                        <i class="fa-solid fa-database w-5"></i> Data Master
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak class="bg-black/10 pb-2">
+                    <a href="{{ route('admin.data-siswa') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-siswa') ? 'text-blue-300 font-bold' : '' }}">
+                        + Data Siswa
+                    </a>
+                    <a href="{{ route('admin.data-guru') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-guru') ? 'text-blue-300 font-bold' : '' }}">
+                        + Data Guru
+                    </a>
+                    <a href="{{ route('admin.data-kelas') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.data-kelas') ? 'text-blue-300 font-bold' : '' }}">
+                        + Data Kelas
+                    </a>
+                </div>
+            </div>
 
             <div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/tahun-*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
@@ -68,14 +68,15 @@
             </div>
         </nav>
 
-        {{-- Logout pakai POST bukan GET --}}
-        <form method="POST" action="{{ route('logout') }}">
+                {{-- Form Logout  --}}
+        <form id="logout-form" method="POST" action="{{ route('logout') }}" x-data>
             @csrf
-            <button type="submit" class="w-full py-4 px-4 hover:bg-red-500 transition border-t border-white/10 mt-auto text-sm text-left text-white">
+            <button type="button" 
+                    @click="if (confirm('Apakah Anda yakin ingin keluar?')) { $el.closest('form').submit(); }"
+                    class="w-full py-4 px-4 hover:bg-red-500 transition border-t border-white/10 mt-auto text-sm text-left text-white bg-transparent">
                 <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
             </button>
         </form>
-
     </aside>
 
     <div class="ml-[210px] flex-1 p-6 transition-all duration-300">
@@ -97,5 +98,8 @@
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

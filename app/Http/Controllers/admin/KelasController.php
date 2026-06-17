@@ -12,10 +12,13 @@ class KelasController extends Controller
 {
     public function index()
     {
+        
         $kelas = Kelas::with('guru')->paginate(10);
         $gurus = Guru::all(); 
-        
-        return view('admin.data-kelas', compact('kelas', 'gurus'));
+        $nipGuruTerpakai = Kelas::whereNotNull('nip_guru')->pluck('nip_guru')->toArray();
+        $gurusTersedia = Guru::whereNotIn('nip', $nipGuruTerpakai)->get();
+
+        return view('admin.data-kelas', compact('kelas', 'gurus', 'gurusTersedia', 'nipGuruTerpakai'));
     }
 
     public function store(Request $request)
@@ -36,7 +39,6 @@ class KelasController extends Controller
             ]);
             return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil ditambahkan!');
         } catch (UniqueConstraintViolationException $e) {
-            // Jika guru sudah dipakai, kembalikan ke halaman sebelumnya dengan pesan error
             return redirect()->back()->withInput()->withErrors(['nip_guru' => 'Guru tersebut sudah menjadi Wali Kelas di kelas lain!']);
         }
     }
@@ -57,7 +59,6 @@ class KelasController extends Controller
             ]);
             return redirect()->route('admin.data-kelas')->with('success', 'Data Kelas berhasil diperbarui!');
         } catch (UniqueConstraintViolationException $e) {
-            // pesan error jika guru sudah menjadi walikelas di kelas lain
             return redirect()->back()->withInput()->withErrors(['nip_guru' => 'Gagal memperbarui! Guru tersebut sudah menjadi Wali Kelas di kelas lain!']);
         }
     }

@@ -13,8 +13,23 @@
             </div>
         @endif
 
-        <div class="flex justify-end mb-3">
-            <button @click="openTambah = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
+            <form action="{{ route('admin.data-guru') }}" method="GET" class="w-full sm:w-80 flex gap-2">
+                <div class="relative w-full">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama guru atau NIP..." 
+                           class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </div>
+                </div>
+                @if(request('search'))
+                    <a href="{{ route('admin.data-guru') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-xl transition text-sm flex items-center shadow-sm" title="Reset Pencarian">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </a>
+                @endif
+            </form>
+
+            <button @click="openTambah = true" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition text-sm font-semibold whitespace-nowrap text-center">
                 + Tambah Data Guru
             </button>
         </div>
@@ -55,9 +70,10 @@
                             <span class="block text-xs text-gray-400">Hub: {{ $guru->no_telp ?? '-' }}</span>
                         </td>
                         
+                        {{-- BAGIAN KOLOM ROLE YANG SUDAH UPDATE OTOMATIS BERDASARKAN STATUS NYATA --}}
                         <td class="p-3 text-center sm:table-cell hidden">
-                            @if($guru->kelas)
-                                <span class="bg-green-50 text-green-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap border border-green-100">
+                            @if($guru->statusRole() === 'Wali Kelas')
+                                <span class="bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap border border-emerald-100">
                                     Wali Kelas
                                 </span>
                             @else
@@ -88,7 +104,7 @@
                     <tr>
                         <td colspan="7" class="p-8 text-center text-gray-400">
                             <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
-                            Belum ada data guru di dalam database.
+                            Tidak ada data guru yang ditemukan.
                         </td>
                     </tr>
                     @endforelse

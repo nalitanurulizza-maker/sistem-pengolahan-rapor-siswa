@@ -10,7 +10,15 @@ class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $data_guru = Guru::with('kelas')->paginate(10);
+        $search = $request->input('search');
+
+        $data_guru = Guru::with('kelas')
+            ->when($search, function ($query, $search) {
+                return $query->where('nama_guru', 'like', '%' . $search . '%')
+                             ->orWhere('nip', 'like', '%' . $search . '%');
+            })
+            ->paginate(10)
+            ->withQueryString(); // Menjaga parameter ?search tetap ada saat pindah halaman pagination
 
         $guru_edit = null;
         if ($request->has('edit_nip')) {
