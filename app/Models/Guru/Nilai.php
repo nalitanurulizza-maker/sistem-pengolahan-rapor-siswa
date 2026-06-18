@@ -14,7 +14,7 @@ class Nilai extends Model
     protected $primaryKey = 'kode_nilai';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = true;
+    public $timestamps = false; 
 
     protected $fillable = [
         'kode_nilai',
@@ -24,7 +24,7 @@ class Nilai extends Model
         'nilai_uts',
         'nilai_uas',
         'nilai_akhir',
-        'tahun_ajaran'
+        'tahun_ajaran' 
     ];
 
     public function siswa()

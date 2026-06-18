@@ -132,6 +132,13 @@ Route::middleware(['auth', 'role:guru,wali kelas'])
         Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])
             ->name('simpan-nilai-batch');
 
+        // RAPOR & NILAI AKHIR
+        Route::get('/rapor', [GuruDashboardController::class, 'rapor'])
+            ->name('rapor');
+
+        Route::post('/hitung-nilai-akhir', [GuruDashboardController::class, 'hitungNilaiAkhir'])
+            ->name('hitung-nilai-akhir');
+
         // KEHADIRAN
         Route::get('/input-kehadiran', [GuruDashboardController::class, 'inputKehadiran'])
             ->name('input-kehadiran');

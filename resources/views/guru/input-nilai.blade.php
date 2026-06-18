@@ -44,17 +44,21 @@
             <div class="md:w-3/4 relative">
                 <select id="select-jenis" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
                     <option value="" disabled selected>-- Pilih Kategori Nilai --</option>
-                    <option value="Harian">Harian</option>
-                    <option value="UTS">UTS</option>
-                    <option value="UAS">UAS</option>
+                    <option value="harian">Harian</option>
+                    <option value="uts">UTS</option>
+                    <option value="uas">UAS</option>
                 </select>
                 <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
             </div>
         </div>
     </div>
 
-    <div id="notif-sukses-ajax" class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold flex items-center gap-2" style="display: none;">
-        <i class="fa-solid fa-circle-check text-base"></i> <span id="text-notif">Data berhasil disimpan!</span>
+    {{-- Notifikasi sukses --}}
+    <div id="notif-sukses-ajax"
+         class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold flex items-center gap-2"
+         style="display: none;">
+        <i class="fa-solid fa-circle-check text-base"></i>
+        <span id="text-notif">Data berhasil disimpan!</span>
     </div>
 
     <div class="mb-6" id="wrapper-tombol-input" style="display:none;">
@@ -88,12 +92,14 @@
 
 </div>
 
+{{-- MODAL INPUT NILAI --}}
 <div id="overlay-modal"
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
 
     <div style="background:#fff; border-radius:16px; width:100%; max-width:680px; max-height:85vh;
                 display:flex; flex-direction:column; margin:1rem; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
 
+        {{-- Header Modal --}}
         <div style="background:#1a2340; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0;">
             <div>
                 <p id="modal-main-title" style="margin:0; color:#fff; font-weight:700; font-size:0.875rem; text-transform:uppercase; letter-spacing:0.05em;">
@@ -106,10 +112,12 @@
                     aria-label="Tutup modal">&times;</button>
         </div>
 
-        <form id="form-nilai" action="{{ route('guru.simpan-nilai-batch') }}" method="POST" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+        {{-- Form --}}
+        <form id="form-nilai" action="{{ route('guru.simpan-nilai-batch') }}" method="POST"
+              style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
             @csrf
-            <input type="hidden" name="kode_kelas" id="hidden-kelas">
-            <input type="hidden" name="kode_mp"    id="hidden-mapel">
+            <input type="hidden" name="kode_kelas"  id="hidden-kelas">
+            <input type="hidden" name="kode_mp"     id="hidden-mapel">
             <input type="hidden" name="jenis_nilai" id="hidden-jenis">
 
             <div id="modal-list-siswa" style="padding:1.5rem; overflow-y:auto; flex:1; background:#f9fafb;">
@@ -137,20 +145,22 @@
 (function () {
     'use strict';
 
-    var dataSiswa    = [];
-    var fetchUrl     = '{{ route("guru.input-nilai") }}';
+    var dataSiswa  = [];
+    var fetchUrl   = '{{ route("guru.input-nilai") }}';
+    var csrfToken  = '{{ csrf_token() }}'; // FIXED: simpan csrf token
 
-    var selKelas     = document.getElementById('select-kelas');
-    var selMapel     = document.getElementById('select-mapel');
-    var selJenis     = document.getElementById('select-jenis');
-    var wrapTombol   = document.getElementById('wrapper-tombol-input');
-    var btnMassal    = document.getElementById('btn-input-massal');
-    var overlay      = document.getElementById('overlay-modal');
-    var formNilai    = document.getElementById('form-nilai');
-    var modalTitle   = document.getElementById('modal-main-title');
+    var selKelas   = document.getElementById('select-kelas');
+    var selMapel   = document.getElementById('select-mapel');
+    var selJenis   = document.getElementById('select-jenis');
+    var wrapTombol = document.getElementById('wrapper-tombol-input');
+    var btnMassal  = document.getElementById('btn-input-massal');
+    var overlay    = document.getElementById('overlay-modal');
+    var formNilai  = document.getElementById('form-nilai');
+    var modalTitle = document.getElementById('modal-main-title');
 
-    window.addEventListener('DOMContentLoaded', function() {
-        var urlParams = new URLSearchParams(window.location.search);
+    // Restore filter dari URL params
+    window.addEventListener('DOMContentLoaded', function () {
+        var urlParams  = new URLSearchParams(window.location.search);
         var paramKelas = urlParams.get('kelas');
         var paramMapel = urlParams.get('mapel');
         var paramJenis = urlParams.get('jenis');
@@ -181,30 +191,37 @@
         renderTabelLoading();
 
         var url = fetchUrl
-            + '?kode_kelas=' + encodeURIComponent(kelas)
-            + '&kode_mp='    + encodeURIComponent(mapel)
-            + '&jenis_nilai='+ encodeURIComponent(jenis);
+            + '?kode_kelas='  + encodeURIComponent(kelas)
+            + '&kode_mp='     + encodeURIComponent(mapel)
+            + '&jenis_nilai=' + encodeURIComponent(jenis);
 
-        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
-            .then(function (res) {
-                if (!res.ok) throw new Error('Status ' + res.status);
-                return res.json();
-            })
-            .then(function (data) {
-                dataSiswa = data;
-                renderTabel();
-            })
-            .catch(function (err) {
-                console.error('[E-Rapor] Gagal fetch siswa:', err);
-                renderTabelError();
-            });
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken // FIXED: sertakan csrf token
+            }
+        })
+        .then(function (res) {
+            if (!res.ok) throw new Error('Status ' + res.status);
+            return res.json();
+        })
+        .then(function (data) {
+            dataSiswa = data;
+            renderTabel();
+        })
+        .catch(function (err) {
+            console.error('[E-Rapor] Gagal fetch siswa:', err);
+            renderTabelError();
+        });
     }
 
+    // Submit simpan nilai
     formNilai.addEventListener('submit', function (e) {
         e.preventDefault();
 
         var btnSubmit = document.getElementById('btn-simpan-submit');
-        btnSubmit.disabled = true;
+        btnSubmit.disabled    = true;
         btnSubmit.textContent = 'Menyimpan...';
 
         var formData = new FormData(formNilai);
@@ -212,61 +229,69 @@
         fetch(formNilai.action, {
             method: 'POST',
             body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken // FIXED: sertakan csrf token
+            }
         })
         .then(function (res) {
-            if (!res.ok) throw new Error('Gagal menyimpan data');
+            if (!res.ok) throw new Error('Gagal menyimpan data, status: ' + res.status);
             return res.json();
         })
         .then(function (data) {
             tutupModal();
-            
+
             var notif = document.getElementById('notif-sukses-ajax');
             notif.style.display = 'flex';
-            setTimeout(function() { notif.style.display = 'none'; }, 3000);
+            setTimeout(function () { notif.style.display = 'none'; }, 3000);
 
-            onFilterChange(); 
+            onFilterChange();
         })
         .catch(function (err) {
-            alert('Terjadi kesalahan saat menyimpan nilai.');
+            alert('Terjadi kesalahan saat menyimpan nilai: ' + err.message);
             console.error(err);
         })
         .finally(function () {
-            btnSubmit.disabled = false;
+            btnSubmit.disabled    = false;
             btnSubmit.textContent = 'Simpan Semua Nilai';
         });
     });
 
-    window.hapusNilaiSatuSiswa = function(nis, nama) {
+    // Hapus nilai satu siswa
+    window.hapusNilaiSatuSiswa = function (nis, nama) {
         if (!confirm('Apakah Anda yakin ingin menghapus nilai untuk ' + nama + '?')) {
             return;
         }
 
         var formData = new FormData();
-        formData.append('kode_kelas', selKelas.value);
-        formData.append('kode_mp', selMapel.value);
+        formData.append('kode_kelas',  selKelas.value);
+        formData.append('kode_mp',     selMapel.value);
         formData.append('jenis_nilai', selJenis.value);
-        formData.append('nis', nis);
-        formData.append('_token', '{{ csrf_token() }}'); // FIX: Diapit dengan tanda kutip tunggal string JS
+        formData.append('nis',         nis);
+        formData.append('_token',      csrfToken); // FIXED: pakai variabel csrfToken
 
         fetch(formNilai.action, {
             method: 'POST',
             body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            }
         })
-        .then(function(res) {
-            if(res.ok) {
+        .then(function (res) {
+            if (res.ok) {
                 onFilterChange();
             } else {
                 alert('Gagal menghapus nilai.');
             }
         })
-        .catch(function(err) {
+        .catch(function (err) {
             console.error(err);
             alert('Terjadi kesalahan sistem.');
         });
     };
 
+    // --- Render helpers ---
     function renderTabelLoading() {
         document.getElementById('tabel-siswa-body').innerHTML =
             '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-400 italic">Memuat data siswa...</td></tr>';
@@ -292,27 +317,31 @@
 
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-gray-50 transition';
-            tr.innerHTML  = '<td class="px-4 py-3 border-r text-center text-xs font-medium">' + (i + 1) + '</td>'
-                          + '<td class="px-4 py-3 border-r font-semibold text-gray-800">'    + esc(s.nama_siswa) + '</td>'
-                          + '<td class="px-4 py-3 border-r text-gray-500">'                  + esc(s.nisn || '-') + '</td>'
-                          + '<td class="px-4 py-3 border-r text-gray-500">'                  + esc(s.nis  || '-') + '</td>'
-                          + '<td class="px-4 py-3 border-r text-center text-base ' + colorClass + '">' + nilai + '</td>'
-                          + '<td class="px-4 py-3 text-center flex items-center justify-center gap-2">'
-                          + '  <button type="button" class="btn-ubah p-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition shadow-sm flex items-center justify-center w-8 h-8" title="Ubah Nilai">'
-                          + '     <i class="fa-solid fa-pen-to-square text-xs"></i>'
-                          + '  </button>'
-                          + '  <button type="button" class="btn-hapus p-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-600 hover:text-white transition shadow-sm flex items-center justify-center w-8 h-8" title="Hapus Nilai" onclick="hapusNilaiSatuSiswa(\'' + esc(s.nis) + '\', \'' + esc(s.nama_siswa) + '\')">'
-                          + '     <i class="fa-solid fa-trash-can text-xs"></i>'
-                          + '  </button>'
-                          + '</td>';
+            tr.innerHTML = ''
+                + '<td class="px-4 py-3 border-r text-center text-xs font-medium">' + (i + 1) + '</td>'
+                + '<td class="px-4 py-3 border-r font-semibold text-gray-800">'     + esc(s.nama_siswa) + '</td>'
+                + '<td class="px-4 py-3 border-r text-gray-500">'                   + esc(s.nisn || '-') + '</td>'
+                + '<td class="px-4 py-3 border-r text-gray-500">'                   + esc(s.nis  || '-') + '</td>'
+                + '<td class="px-4 py-3 border-r text-center text-base ' + colorClass + '">' + nilai + '</td>'
+                + '<td class="px-4 py-3 text-center flex items-center justify-center gap-2">'
+                +   '<button type="button" class="btn-ubah p-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition shadow-sm flex items-center justify-center w-8 h-8" title="Ubah Nilai">'
+                +     '<i class="fa-solid fa-pen-to-square text-xs"></i>'
+                +   '</button>'
+                +   '<button type="button" class="btn-hapus p-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-600 hover:text-white transition shadow-sm flex items-center justify-center w-8 h-8" title="Hapus Nilai"'
+                +          ' onclick="hapusNilaiSatuSiswa(\'' + esc(s.nis) + '\', \'' + esc(s.nama_siswa) + '\')">'
+                +     '<i class="fa-solid fa-trash-can text-xs"></i>'
+                +   '</button>'
+                + '</td>';
 
-            tr.querySelector('.btn-ubah').addEventListener('click', function() {
+            tr.querySelector('.btn-ubah').addEventListener('click', function () {
                 bukaModalSatuSiswa(s);
             });
+
             tbody.appendChild(tr);
         });
     }
 
+    // --- Modal ---
     btnMassal.addEventListener('click', bukaModalMultiSiswa);
     document.getElementById('btn-tutup-x').addEventListener('click',    tutupModal);
     document.getElementById('btn-tutup-batal').addEventListener('click', tutupModal);
@@ -338,17 +367,15 @@
 
     function bukaModalSatuSiswa(siswa) {
         siapkanBaseModal();
-        
         if (modalTitle) modalTitle.textContent = 'Form Edit Nilai';
 
         var container = document.getElementById('modal-list-siswa');
         container.innerHTML = '';
 
         var nilaiLama = siswa.nilai_sekarang != null ? siswa.nilai_sekarang : '';
-        var row = generateRowInputSiswa(siswa, nilaiLama);
-        container.appendChild(row);
+        container.appendChild(generateRowInputSiswa(siswa, nilaiLama));
 
-        overlay.style.display = 'flex';
+        overlay.style.display    = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
@@ -359,7 +386,6 @@
         }
 
         siapkanBaseModal();
-        
         if (modalTitle) modalTitle.textContent = 'Form Input Nilai';
 
         var container = document.getElementById('modal-list-siswa');
@@ -370,12 +396,11 @@
         } else {
             dataSiswa.forEach(function (s) {
                 var nilaiLama = s.nilai_sekarang != null ? s.nilai_sekarang : '';
-                var row = generateRowInputSiswa(s, nilaiLama);
-                container.appendChild(row);
+                container.appendChild(generateRowInputSiswa(s, nilaiLama));
             });
         }
 
-        overlay.style.display = 'flex';
+        overlay.style.display    = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
@@ -385,12 +410,12 @@
                           + 'padding:0.75rem 1rem;background:#fff;border:1px solid #f0f0f0;'
                           + 'border-radius:12px;margin-bottom:0.5rem;';
         row.innerHTML =
-             '<div style="flex:1;padding-right:1rem;">'
+              '<div style="flex:1;padding-right:1rem;">'
             +   '<p style="margin:0;font-weight:700;font-size:0.875rem;color:#1f2937;">' + esc(s.nama_siswa) + '</p>'
             +   '<p style="margin:0.15rem 0 0;font-size:0.7rem;color:#9ca3af;">NIS: ' + esc(s.nis || '-') + ' | NISN: ' + esc(s.nisn || '-') + '</p>'
             + '</div>'
             + '<div style="width:6rem;">'
-            +   '<input type="number" name="nilai[' + esc(s.nis) + ']" min="0" max="100" placeholder="0-100" value="' + nilaiLama + '" '
+            +   '<input type="number" name="nilai[' + esc(s.nis) + ']" min="0" max="100" placeholder="0-100" value="' + esc(String(nilaiLama)) + '" '
             +          'style="width:100%;padding:0.5rem;border:1px solid #d1d5db;border-radius:10px;text-align:center;'
             +                 'font-weight:700;font-size:1rem;outline:none;" '
             +          'onfocus="this.style.borderColor=\'#3b82f6\'" onblur="this.style.borderColor=\'#d1d5db\'">'
@@ -399,16 +424,16 @@
     }
 
     function tutupModal() {
-        overlay.style.display = 'none';
+        overlay.style.display        = 'none';
         document.body.style.overflow = '';
     }
 
     function esc(str) {
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/&/g,  '&amp;')
+            .replace(/</g,  '&lt;')
+            .replace(/>/g,  '&gt;')
+            .replace(/"/g,  '&quot;');
     }
 
 })();
