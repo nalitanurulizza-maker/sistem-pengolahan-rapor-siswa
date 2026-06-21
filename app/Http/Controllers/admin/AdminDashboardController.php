@@ -17,7 +17,7 @@ class AdminDashboardController extends Controller
             'jumlahGuru'  => $this->checkTableAndCount('guru'),
             'jumlahSiswa' => $this->checkTableAndCount('siswa'),
             'jumlahKelas' => $this->checkTableAndCount('kelas'),
-            'jumlahMapel' => $this->checkTableAndCount('mapel'),
+            'jumlahMapel' => $this->checkTableAndCount('mata_pelajaran'),
         ];
 
         return view('admin.dashboard-admin', compact('rekapData'));

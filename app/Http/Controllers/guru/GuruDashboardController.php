@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin\Siswa;
 use App\Models\Guru\Nilai;
+use App\Models\Admin\GuruPengampu; 
 
 class GuruDashboardController extends Controller
 {
@@ -23,11 +24,26 @@ class GuruDashboardController extends Controller
         return $data;
     }
 
-    public function index()
+   public function index()
     {
         $data_guru_aktif = $this->getGuruAktif();
-        $plotMengajar = DB::table('plot_guru')->where('nip', $data_guru_aktif->nip)->get();
-        $kelasDiampu = $plotMengajar->pluck('kode_kelas')->unique()->toArray();
+
+        $tahun_aktif = DB::table('tahun_akademik')->where('status', 'Aktif')->first();
+        
+        if ($tahun_aktif) {
+            $tahun_ajaran = $tahun_aktif->nama_tahun; 
+            $semester_aktif = $tahun_aktif->semester;
+        } else {
+            $tahun_ajaran = '-';
+            $semester_aktif = '-';
+        }
+
+        // 3. Ambil data plot mengajar guru sesuai tahun ajaran yang sedang aktif
+        $plotMengajar = GuruPengampu::where('guru_id', $data_guru_aktif->nip)
+                                    ->where('tahun_akademik', $tahun_ajaran)
+                                    ->get();
+                                    
+        $kelasDiampu = $plotMengajar->pluck('kelas_id')->unique()->toArray();
         
         $rekapData = [
             'jumlahMapel'     => $plotMengajar->unique('kode_mp')->count(),
@@ -36,7 +52,7 @@ class GuruDashboardController extends Controller
             'nilaiBelumInput' => 0 
         ];
 
-        return view('guru.dashboard-guru', compact('rekapData', 'data_guru_aktif'));
+        return view('guru.dashboard-guru', compact('rekapData', 'data_guru_aktif', 'tahun_ajaran', 'semester_aktif'));
     }
 
     // --- FITUR INPUT NILAI ---
@@ -60,15 +76,14 @@ class GuruDashboardController extends Controller
             );
         }
         
-        $plot = DB::table('plot_guru')
-                ->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
-                ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
-                ->where('plot_guru.nip', $d->nip)
+        $plot = GuruPengampu::with(['kelas', 'mapel'])
+                ->where('guru_id', $d->nip)
                 ->get();
                 
         return view('guru.input-nilai', [
-            'kelas'          => $plot->unique('kode_kelas'), 
-            'mata_pelajaran' => $plot->unique('kode_mp'), 
+            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
+            'kelas'          => $plot->pluck('kelas')->unique('kode_kelas'), 
+            'mata_pelajaran' => $plot->pluck('mapel')->unique('kode_mp'), 
             'd'              => $d
         ]);
     }
@@ -111,10 +126,8 @@ class GuruDashboardController extends Controller
     {
         $d = $this->getGuruAktif();
         
-        $plot = DB::table('plot_guru')
-                ->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
-                ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
-                ->where('plot_guru.nip', $d->nip)
+        $plot = GuruPengampu::with(['kelas', 'mapel'])
+                ->where('guru_id', $d->nip)
                 ->get();
 
         $siswa = [];
@@ -123,8 +136,9 @@ class GuruDashboardController extends Controller
         }
 
         return view('guru.input-kehadiran', [
-            'kelas'           => $plot->unique('kode_kelas'), 
-            'mata_pelajaran'  => $plot->unique('kode_mp'), 
+            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
+            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'), 
+            'mata_pelajaran'  => $plot->pluck('mapel')->unique('kode_mp'), 
             'data_guru_aktif' => $d,
             'siswa'           => $siswa
         ]);
@@ -200,15 +214,14 @@ class GuruDashboardController extends Controller
             );
         }
 
-        $plot = DB::table('plot_guru')
-                ->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
-                ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
-                ->where('plot_guru.nip', $d->nip)
+        $plot = GuruPengampu::with(['kelas', 'mapel'])
+                ->where('guru_id', $d->nip)
                 ->get();
 
         return view('guru.cek-nilai', [
-            'kelas'           => $plot->unique('kode_kelas'), 
-            'mata_pelajaran'  => $plot->unique('kode_mp'), 
+            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
+            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'), 
+            'mata_pelajaran'  => $plot->pluck('mapel')->unique('kode_mp'), 
             'data_guru_aktif' => $d
         ]); 
     }

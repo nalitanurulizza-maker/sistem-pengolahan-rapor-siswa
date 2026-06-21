@@ -3,7 +3,7 @@
 @section('title', 'Tahun Academic')
 
 @section('content')
-<div x-data="{ openTambah: false }">
+<div x-data="{ openTambah: {{ $errors->any() ? 'true' : 'false' }} }">
 
     <div class="p-4 sm:p-6">
         <h2 class="text-xl font-bold mb-4 text-gray-800">DATA TAHUN AKADEMIK</h2>
@@ -118,16 +118,23 @@
         <div @click.away="openTambah = false" class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-md border border-gray-100">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6 border-b pb-2">
-                    <h3 class="text-xl font-bold text-gray-900">Tahun Akademik Baru</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Tahun Academic Baru</h3>
                     <button @click="openTambah = false" class="text-gray-400 hover:text-gray-600 text-sm">✕</button>
                 </div>
+                
+                @if ($errors->has('tahun_akademik'))
+                    <div class="mb-4 p-3 text-xs text-red-700 bg-red-50 rounded-xl border border-red-100 flex items-center gap-2 shadow-sm font-semibold">
+                        <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                        <span>{{ $errors->first('tahun_akademik') }}</span>
+                    </div>
+                @endif
                 
                 <form action="{{ route('admin.tahun-akademik.store') }}" method="POST" class="space-y-4">
                     @csrf
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Tahun Pelajaran</label>
-                        <input type="text" name="tahun_akademik" required placeholder="Contoh: 2026/2027"
+                        <input type="text" name="tahun_akademik" required value="{{ old('tahun_akademik') }}" placeholder="Contoh: 2026/2027"
                                class="mt-1 block w-full rounded-xl border border-gray-200 p-2.5 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-sm placeholder:text-gray-400 text-gray-700">
                     </div>
 
@@ -135,12 +142,12 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Semester</label>
                         <div class="flex gap-6 items-center">
                             <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="semester" value="Ganjil" required 
+                                <input type="radio" name="semester" value="Ganjil" required {{ old('semester') == 'Ganjil' ? 'checked' : '' }}
                                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"> 
                                 <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition">Ganjil</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="semester" value="Genap" required 
+                                <input type="radio" name="semester" value="Genap" required {{ old('semester') == 'Genap' ? 'checked' : '' }}
                                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"> 
                                 <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition">Genap</span>
                             </label>

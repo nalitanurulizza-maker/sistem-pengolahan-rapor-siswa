@@ -9,12 +9,15 @@ class TahunAkademik extends Model
 {
     use HasFactory;
 
-    protected $table = 'tahun_akademik'; // Sesuaikan dengan nama tabel di phpMyAdmin Anda
+    protected $table = 'tahun_akademik';
     protected $primaryKey = 'id';
-    public $timestamps = false;
+    
+    // Sesuaikan timestamps menjadi true jika Anda menggunakan created_at dan updated_at seperti di foto
+    public $timestamps = true; 
 
     protected $fillable = [
-        'tahun_akademik',
+        'name',          // Tambahkan ini
+        'nama_tahun',    // Tambahkan ini
         'semester',
         'status'
     ];

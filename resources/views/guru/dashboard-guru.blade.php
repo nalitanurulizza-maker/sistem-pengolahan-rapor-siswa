@@ -72,17 +72,15 @@
         @endif
     </div>
 
-    <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="lg:col-span-4 flex flex-col gap-6">
 
-        <div class="bg-white p-6 rounded-2xl shadow">
-            <h6 class="font-bold text-gray-800 border-b pb-3 mb-4 text-sm">
-                Tahun Akademik Aktif
-            </h6>
-            <div class="p-4 bg-blue-50 border rounded-lg flex gap-3">
-                <i class="fa-solid fa-calendar-check text-blue-500 mt-0.5"></i>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h5 class="text-sm font-semibold text-gray-500 uppercase">Tahun Akademik Aktif</h5>
+            <div class="flex items-center gap-3 mt-4 text-blue-600">
+                <i class="fa-solid fa-calendar-days text-2xl"></i>
                 <div>
-                    <p class="text-sm font-bold text-blue-800">{{ $tahunAkademik->nama_tahun ?? '-' }}</p>
-                    <p class="text-xs text-blue-600 mt-0.5">Semester {{ $tahunAkademik->semester ?? '-' }}</p>
+                    <p class="font-bold text-gray-800 text-lg leading-tight">{{ $tahun_ajaran }}</p>
+                    <p class="text-xs text-gray-500 font-medium">Semester {{ $semester_aktif }}</p>
                 </div>
             </div>
         </div>

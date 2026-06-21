@@ -50,22 +50,28 @@
                 </div>
             </div>
 
-            <div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/tahun-*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
-                    <span class="flex items-center">
-                        <i class="fa-solid fa-graduation-cap w-5"></i> Akademik
-                    </span>
-                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
-                </button>
-                <div x-show="open" x-cloak class="bg-black/10 pb-2">
-                    <a href="{{ route('admin.mata-pelajaran') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.mata-pelajaran') ? 'text-blue-300 font-bold' : '' }}">
-                        + Mata Pelajaran
-                    </a>
-                    <a href="{{ route('admin.tahun-akademik') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.tahun-akademik') ? 'text-blue-300 font-bold' : '' }}">
-                        + Tahun Akademik
-                    </a>
-                </div>
-            </div>
+            {{-- Awal Kelompok Akademik --}}
+<div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/tahun-*') || request()->is('admin/guru-pengampu*') ? 'true' : 'false' }} }">
+    <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
+        <span class="flex items-center">
+            <i class="fa-solid fa-graduation-cap w-5"></i> Akademik
+        </span>
+        <i class="fa-solid fa-chevron-down text-[10px] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+    </button>
+    <div x-show="open" x-cloak class="bg-black/10 pb-2">
+        <a href="{{ route('admin.mata-pelajaran') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.mata-pelajaran') ? 'text-blue-300 font-bold' : '' }}">
+            + Mata Pelajaran
+        </a>
+        <a href="{{ route('admin.guru-pengampu.index') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.guru-pengampu.index') ? 'text-blue-300 font-bold' : '' }}">
+            + Guru Pengampu
+        </a>
+        <a href="{{ route('admin.tahun-akademik') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.tahun-akademik') ? 'text-blue-300 font-bold' : '' }}">
+            + Tahun Akademik
+        </a>
+        
+    </div>
+</div>
+{{-- Akhir Kelompok Akademik --}}
         </nav>
 
                 {{-- Form Logout  --}}

@@ -13,12 +13,14 @@
 <div class="bg-white p-8 rounded-t-3xl shadow-sm border border-gray-100 mt-6 min-h-[calc(100vh-180px)] flex flex-col">
 
     <div class="w-full space-y-4 mb-6">
+        
         <div class="flex flex-col md:flex-row md:items-center gap-4">
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Kelas</label>
             <div class="md:w-3/4 relative">
                 <select id="select-kelas" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
                     <option value="" disabled selected>-- Pilih Kelas --</option>
                     @foreach($kelas as $k)
+                        {{-- Kembalikan nilai value menjadi $k->kode_kelas --}}
                         <option value="{{ $k->kode_kelas }}">{{ $k->nama_kelas }}</option>
                     @endforeach
                 </select>
@@ -147,7 +149,7 @@
 
     var dataSiswa  = [];
     var fetchUrl   = '{{ route("guru.input-nilai") }}';
-    var csrfToken  = '{{ csrf_token() }}'; // FIXED: simpan csrf token
+    var csrfToken  = '{{ csrf_token() }}';
 
     var selKelas   = document.getElementById('select-kelas');
     var selMapel   = document.getElementById('select-mapel');
@@ -158,7 +160,6 @@
     var formNilai  = document.getElementById('form-nilai');
     var modalTitle = document.getElementById('modal-main-title');
 
-    // Restore filter dari URL params
     window.addEventListener('DOMContentLoaded', function () {
         var urlParams  = new URLSearchParams(window.location.search);
         var paramKelas = urlParams.get('kelas');
@@ -199,7 +200,7 @@
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken // FIXED: sertakan csrf token
+                'X-CSRF-TOKEN': csrfToken
             }
         })
         .then(function (res) {
@@ -216,7 +217,6 @@
         });
     }
 
-    // Submit simpan nilai
     formNilai.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -231,7 +231,7 @@
             body: formData,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken // FIXED: sertakan csrf token
+                'X-CSRF-TOKEN': csrfToken
             }
         })
         .then(function (res) {
@@ -257,7 +257,6 @@
         });
     });
 
-    // Hapus nilai satu siswa
     window.hapusNilaiSatuSiswa = function (nis, nama) {
         if (!confirm('Apakah Anda yakin ingin menghapus nilai untuk ' + nama + '?')) {
             return;
@@ -268,7 +267,7 @@
         formData.append('kode_mp',     selMapel.value);
         formData.append('jenis_nilai', selJenis.value);
         formData.append('nis',         nis);
-        formData.append('_token',      csrfToken); // FIXED: pakai variabel csrfToken
+        formData.append('_token',      csrfToken);
 
         fetch(formNilai.action, {
             method: 'POST',
@@ -291,7 +290,6 @@
         });
     };
 
-    // --- Render helpers ---
     function renderTabelLoading() {
         document.getElementById('tabel-siswa-body').innerHTML =
             '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-400 italic">Memuat data siswa...</td></tr>';
@@ -312,7 +310,7 @@
         }
 
         dataSiswa.forEach(function (s, i) {
-            var nilai      = s.nilai_sekarang != null ? s.nilai_sekarang : '-';
+            var nilai    = s.nilai_sekarang != null ? s.nilai_sekarang : '-';
             var colorClass = nilai !== '-' ? 'text-emerald-600 font-bold' : 'text-blue-500';
 
             var tr = document.createElement('tr');
@@ -341,7 +339,6 @@
         });
     }
 
-    // --- Modal ---
     btnMassal.addEventListener('click', bukaModalMultiSiswa);
     document.getElementById('btn-tutup-x').addEventListener('click',    tutupModal);
     document.getElementById('btn-tutup-batal').addEventListener('click', tutupModal);
@@ -417,7 +414,7 @@
             + '<div style="width:6rem;">'
             +   '<input type="number" name="nilai[' + esc(s.nis) + ']" min="0" max="100" placeholder="0-100" value="' + esc(String(nilaiLama)) + '" '
             +          'style="width:100%;padding:0.5rem;border:1px solid #d1d5db;border-radius:10px;text-align:center;'
-            +                 'font-weight:700;font-size:1rem;outline:none;" '
+            +                                'font-weight:700;font-size:1rem;outline:none;" '
             +          'onfocus="this.style.borderColor=\'#3b82f6\'" onblur="this.style.borderColor=\'#d1d5db\'">'
             + '</div>';
         return row;
