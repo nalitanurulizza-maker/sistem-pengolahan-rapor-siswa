@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\MapelController;
 use App\Http\Controllers\Admin\TahunAkademikController;
-use App\Http\Controllers\Admin\GuruPengampuController; // <-- IMPORT BARU
+use App\Http\Controllers\Admin\GuruPengampuController;
 
 // CONTROLLER GURU
 use App\Http\Controllers\Guru\GuruDashboardController;
@@ -104,18 +104,17 @@ Route::middleware(['auth', 'role:guru,wali kelas'])
         Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
         Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');
 
-        // RAPOR & NILAI AKHIR
+        // RAPOR (guru mata pelajaran)
         Route::get('/rapor', [GuruDashboardController::class, 'rapor'])->name('rapor');
-        Route::post('/hitung-nilai-akhir', [GuruDashboardController::class, 'hitungNilaiAkhir'])->name('hitung-nilai-akhir');
 
-        // KEHADIRAN
-        Route::get('/input-kehadiran', [GuruDashboardController::class, 'inputKehadiran'])->name('input-kehadiran');
-        Route::post('/simpan-kehadiran', [GuruDashboardController::class, 'simpanKehadiran'])->name('simpan-kehadiran');
-        Route::post('/simpan-absensi-sesi', [GuruDashboardController::class, 'simpanAbsensiSesi'])->name('simpan-absensi-sesi');
-        Route::post('/simpan-rekap-mingguan', [GuruDashboardController::class, 'simpanRekapMingguan'])->name('simpan-rekap-mingguan');
+        // HITUNG NILAI AKHIR
+        Route::post('/hitung-nilai-akhir', [GuruDashboardController::class, 'prosesHitungNilaiAkhir'])->name('hitung-nilai-akhir');
 
-        // FITUR LAIN
-        Route::get('/input-catatan', [GuruDashboardController::class, 'inputCatatan'])->name('input-catatan');
-        Route::get('/input-predikat', [GuruDashboardController::class, 'inputPredikat'])->name('input-predikat');
+        // KHUSUS WALI KELAS
+        Route::get('/cek-rapor', [GuruDashboardController::class, 'cekRapor'])->name('cek-rapor');
+        Route::get('/cek-rapor/{nis}', [GuruDashboardController::class, 'detailRapor'])->name('detail-rapor');
+
+        // CETAK RAPOR
         Route::get('/cetak-rapor', [GuruDashboardController::class, 'cetakRapor'])->name('cetak-rapor');
+        Route::get('/cetak-rapor/pdf/{nis}', [GuruDashboardController::class, 'cetakPdf'])->name('cetak-pdf');
     });

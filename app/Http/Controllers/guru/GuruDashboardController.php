@@ -1,37 +1,159 @@
 <?php
 
-namespace App\Http\Controllers\Guru; 
+namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin\Siswa;
+use App\Models\Admin\TahunAkademik;
+use App\Models\Admin\GuruPengampu;
 use App\Models\Guru\Nilai;
-use App\Models\Admin\GuruPengampu; 
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GuruDashboardController extends Controller
 {
+    // Bobot komponen nilai akhir per mata pelajaran.
+    // Nilai harian diberi bobot lebih besar dibanding UTS/UAS.
+    private const BOBOT_HARIAN = 0.40;
+    private const BOBOT_UTS    = 0.30;
+    private const BOBOT_UAS    = 0.30;
+
+    // Helper untuk mengambil data guru
     private function getGuruAktif()
     {
         $user = Auth::user();
-        $data = DB::table('guru')->where('nip', $user->username)->first() 
+        $data = DB::table('guru')->where('nip', $user->username)->first()
                 ?? (object) ['nama_guru' => $user->name, 'role' => 'guru', 'nip' => $user->username];
 
         $cekWalas = DB::table('kelas')->where('nip_guru', $data->nip)->first();
         $data->role = $cekWalas ? 'wali kelas' : 'guru';
         $data->nama_kelas_walas = $cekWalas ? $cekWalas->nama_kelas : '-';
+        $data->kode_kelas_walas = $cekWalas ? $cekWalas->kode_kelas : null;
         return $data;
     }
 
-   public function index()
+    // Helper: tahun ajaran aktif (fallback ke tahun ajaran berjalan jika belum ada data master)
+    private function getTahunAjaranAktif()
+    {
+        $aktif = TahunAkademik::where('status', 'Aktif')->first();
+        return $aktif->nama_tahun ?? '2026/2027';
+    }
+
+    /**
+     * Hitung nilai akhir satu mata pelajaran dari komponen harian, UTS, UAS.
+     * Komponen yang belum diisi dianggap 0.
+     */
+    private function hitungNilaiAkhir($harian, $uts, $uas): float
+    {
+        $harian = is_numeric($harian) ? (float) $harian : 0;
+        $uts    = is_numeric($uts)    ? (float) $uts    : 0;
+        $uas    = is_numeric($uas)    ? (float) $uas    : 0;
+
+        $akhir = ($harian * self::BOBOT_HARIAN)
+               + ($uts * self::BOBOT_UTS)
+               + ($uas * self::BOBOT_UAS);
+
+        return round($akhir, 2);
+    }
+
+    /**
+     * Tentukan predikat A/B/C/D dari nilai akhir.
+     * A: 85-100, B: 75-84, C: 65-74, D: <65
+     */
+    private function hitungPredikat(float $nilaiAkhir): string
+    {
+        if ($nilaiAkhir >= 85) return 'A';
+        if ($nilaiAkhir >= 75) return 'B';
+        if ($nilaiAkhir >= 65) return 'C';
+        return 'D';
+    }
+
+    /**
+     * Pastikan user yang sedang login adalah wali kelas dari kode_kelas tertentu.
+     * Mengembalikan data guru aktif jika valid, atau abort 403 jika bukan wali kelas kelas tsb.
+     */
+    private function pastikanWaliKelas(?string $kodeKelas = null)
+    {
+        $d = $this->getGuruAktif();
+
+        if ($d->role !== 'wali kelas' || empty($d->kode_kelas_walas)) {
+            abort(403, 'Halaman ini hanya untuk Wali Kelas.');
+        }
+
+        if ($kodeKelas !== null && $kodeKelas !== $d->kode_kelas_walas) {
+            abort(403, 'Anda hanya dapat mengakses data kelas yang Anda wali-i.');
+        }
+
+        return $d;
+    }
+
+    /**
+     * Ambil rekap nilai semua mata pelajaran untuk satu siswa,
+     * lengkap dengan nilai akhir & predikat per mapel, total, dan rata-rata.
+     */
+    private function rekapNilaiSiswa(string $nis, string $tahunAjaran): array
+    {
+        $mapel = DB::table('mata_pelajaran')->orderBy('nama_mp')->get();
+
+        $nilaiPerMapel = Nilai::where('nis', $nis)
+            ->where('tahun_ajaran', $tahunAjaran)
+            ->get()
+            ->keyBy('kode_mp');
+
+        $rekap = [];
+        $totalNilaiAkhir = 0;
+        $jumlahMapelDinilai = 0;
+
+        foreach ($mapel as $mp) {
+            $n = $nilaiPerMapel->get($mp->kode_mp);
+
+            $harian = $n->nilai_harian ?? null;
+            $uts    = $n->nilai_uts ?? null;
+            $uas    = $n->nilai_uas ?? null;
+
+            $adaNilai = $harian !== null || $uts !== null || $uas !== null;
+            $nilaiAkhir = $adaNilai ? $this->hitungNilaiAkhir($harian, $uts, $uas) : null;
+            $predikat = $nilaiAkhir !== null ? $this->hitungPredikat($nilaiAkhir) : '-';
+
+            if ($nilaiAkhir !== null) {
+                $totalNilaiAkhir += $nilaiAkhir;
+                $jumlahMapelDinilai++;
+            }
+
+            $rekap[] = [
+                'kode_mp'      => $mp->kode_mp,
+                'nama_mp'      => $mp->nama_mp,
+                'nilai_harian' => $harian,
+                'nilai_uts'    => $uts,
+                'nilai_uas'    => $uas,
+                'nilai_akhir'  => $nilaiAkhir,
+                'predikat'     => $predikat,
+            ];
+        }
+
+        $rataRata = $jumlahMapelDinilai > 0 ? round($totalNilaiAkhir / $jumlahMapelDinilai, 2) : 0;
+
+        return [
+            'mapel'                => $rekap,
+            'total_nilai_akhir'    => round($totalNilaiAkhir, 2),
+            'rata_rata'            => $rataRata,
+            'jumlah_mapel'         => count($rekap),
+            'jumlah_mapel_dinilai' => $jumlahMapelDinilai,
+            'predikat_rata_rata'   => $this->hitungPredikat($rataRata),
+        ];
+    }
+
+    // --- DASHBOARD ---
+    public function index()
     {
         $data_guru_aktif = $this->getGuruAktif();
 
         $tahun_aktif = DB::table('tahun_akademik')->where('status', 'Aktif')->first();
-        
+
         if ($tahun_aktif) {
-            $tahun_ajaran = $tahun_aktif->nama_tahun; 
+            $tahun_ajaran = $tahun_aktif->nama_tahun;
             $semester_aktif = $tahun_aktif->semester;
         } else {
             $tahun_ajaran = '-';
@@ -42,14 +164,14 @@ class GuruDashboardController extends Controller
         $plotMengajar = GuruPengampu::where('guru_id', $data_guru_aktif->nip)
                                     ->where('tahun_akademik', $tahun_ajaran)
                                     ->get();
-                                    
+
         $kelasDiampu = $plotMengajar->pluck('kelas_id')->unique()->toArray();
-        
+
         $rekapData = [
             'jumlahMapel'     => $plotMengajar->unique('kode_mp')->count(),
             'jumlahSiswa'     => DB::table('siswa')->whereIn('kode_kelas', $kelasDiampu)->count(),
             'nilaiSudahInput' => Nilai::whereIn('kode_mp', $plotMengajar->pluck('kode_mp'))->whereNotNull('nilai_akhir')->count() ?: 0,
-            'nilaiBelumInput' => 0 
+            'nilaiBelumInput' => 0
         ];
 
         return view('guru.dashboard-guru', compact('rekapData', 'data_guru_aktif', 'tahun_ajaran', 'semester_aktif'));
@@ -62,28 +184,27 @@ class GuruDashboardController extends Controller
 
         if ($request->ajax()) {
             $kolom = ['harian' => 'nilai_harian', 'uts' => 'nilai_uts', 'uas' => 'nilai_uas'][$request->jenis_nilai] ?? 'nilai_akhir';
-            
+
             return response()->json(
                 Siswa::where('kode_kelas', $request->kode_kelas)
                     ->with(['nilai' => fn($q) => $q->where('kode_mp', $request->kode_mp)])
                     ->get()
                     ->map(fn($s) => [
-                        'nama_siswa'     => $s->nama_siswa, 
+                        'nama_siswa'     => $s->nama_siswa,
                         'nis'            => $s->nis,
                         'nisn'           => $s->nisn ?? '-',
                         'nilai_sekarang' => $s->nilai->first()?->$kolom
                     ])
             );
         }
-        
+
         $plot = GuruPengampu::with(['kelas', 'mapel'])
                 ->where('guru_id', $d->nip)
                 ->get();
-                
+
         return view('guru.input-nilai', [
-            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
-            'kelas'          => $plot->pluck('kelas')->unique('kode_kelas'), 
-            'mata_pelajaran' => $plot->pluck('mapel')->unique('kode_mp'), 
+            'kelas'          => $plot->pluck('kelas')->unique('kode_kelas'),
+            'mata_pelajaran' => $plot->pluck('mapel')->unique('kode_mp'),
             'd'              => $d
         ]);
     }
@@ -113,81 +234,12 @@ class GuruDashboardController extends Controller
                     'nis'          => $nis,
                     'kode_mp'      => $request->kode_mp,
                     $kolom         => $val,
-                    'tahun_ajaran' => '2026/2027'
+                    'tahun_ajaran' => $this->getTahunAjaranAktif()
                 ]);
             }
         }
 
         return response()->json(['success' => 'Data berhasil disimpan']);
-    }
-
-    // --- FITUR ABSENSI & KEHADIRAN ---
-    public function inputKehadiran(Request $request)
-    {
-        $d = $this->getGuruAktif();
-        
-        $plot = GuruPengampu::with(['kelas', 'mapel'])
-                ->where('guru_id', $d->nip)
-                ->get();
-
-        $siswa = [];
-        if ($request->has('kode_kelas')) {
-            $siswa = Siswa::where('kode_kelas', $request->kode_kelas)->get();
-        }
-
-        return view('guru.input-kehadiran', [
-            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
-            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'), 
-            'mata_pelajaran'  => $plot->pluck('mapel')->unique('kode_mp'), 
-            'data_guru_aktif' => $d,
-            'siswa'           => $siswa
-        ]);
-    }
-
-    public function simpanKehadiran(Request $request)
-    {
-        foreach ($request->kehadiran as $nis => $status) {
-            \App\Models\Guru\Absensi::updateOrCreate(
-                [
-                    'nis'            => $nis,
-                    'tahun_akademik' => '2026/2027' 
-                ],
-                [
-                    'jenis_kehadiran' => $status
-                ]
-            );
-        }
-
-        return redirect()->back()->with('success', 'Data kehadiran berhasil disimpan!');
-    }
-
-    public function simpanAbsensiSesi(Request $request)
-    {
-        foreach ($request->absensi as $nis => $status) {
-            DB::table('absensi')->insert([
-                'nis'             => $nis, 
-                'jenis_kehadiran' => 'SESI:' . $request->kode_mp . ':' . $status, 
-                'tahun_akademik'  => '2026/2027'
-            ]);
-        }
-        return back()->with('success', 'Absensi sesi disimpan!');
-    }
-
-    public function simpanRekapMingguan(Request $request)
-    {
-        foreach ($request->rekap as $nis => $status) {
-            DB::table('absensi')->updateOrInsert(
-                [
-                    'nis'             => $nis,
-                    'tahun_ajaran'    => '2026/2027',
-                    'jenis_kehadiran' => 'REKAP:' . $request->minggu_ke . ':' . $status
-                ],
-                [
-                    'jenis_kehadiran' => 'REKAP:' . $request->minggu_ke . ':' . $status
-                ]
-            );
-        }
-        return back()->with('success', 'Rekap mingguan disimpan!');
     }
 
     // --- FITUR CEK NILAI ---
@@ -219,10 +271,175 @@ class GuruDashboardController extends Controller
                 ->get();
 
         return view('guru.cek-nilai', [
-            // SINKRONISASI: Menggunakan unique berdasarkan kode_kelas string
-            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'), 
-            'mata_pelajaran'  => $plot->pluck('mapel')->unique('kode_mp'), 
+            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'),
+            'mata_pelajaran'   => $plot->pluck('mapel')->unique('kode_mp'),
             'data_guru_aktif' => $d
-        ]); 
+        ]);
+    }
+
+    // --- RAPOR & NILAI AKHIR (GURU MATA PELAJARAN) ---
+    public function rapor(Request $request)
+    {
+        $d = $this->getGuruAktif();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $tahunAjaran = $this->getTahunAjaranAktif();
+
+            $data = Siswa::where('kode_kelas', $request->kode_kelas)
+                ->orderBy('nama_siswa')
+                ->get()
+                ->map(function ($s) use ($request, $tahunAjaran) {
+                    $n = Nilai::where('nis', $s->nis)
+                        ->where('kode_mp', $request->kode_mp)
+                        ->where('tahun_ajaran', $tahunAjaran)
+                        ->first();
+
+                    $harian = $n->nilai_harian ?? null;
+                    $uts    = $n->nilai_uts ?? null;
+                    $uas    = $n->nilai_uas ?? null;
+                    $adaNilai = $harian !== null || $uts !== null || $uas !== null;
+                    $akhir = $adaNilai ? $this->hitungNilaiAkhir($harian, $uts, $uas) : null;
+
+                    return [
+                        'nis'          => $s->nis,
+                        'nama_siswa'   => $s->nama_siswa,
+                        'nilai_harian' => $harian,
+                        'nilai_uts'    => $uts,
+                        'nilai_uas'    => $uas,
+                        'nilai_akhir'  => $akhir,
+                        'predikat'     => $akhir !== null ? $this->hitungPredikat($akhir) : null,
+                    ];
+                });
+
+            return response()->json($data);
+        }
+
+        $plot = DB::table('plot_guru')
+            ->join('kelas', 'plot_guru.kode_kelas', 'kelas.kode_kelas')
+            ->join('mata_pelajaran', 'plot_guru.kode_mp', 'mata_pelajaran.kode_mp')
+            ->where('plot_guru.nip', $d->nip)
+            ->get();
+
+        return view('guru.rapor', ['kelas' => $plot->unique('kode_kelas'), 'mata_pelajaran' => $plot->unique('kode_mp'), 'd' => $d]);
+    }
+
+    // Menghitung & menyimpan nilai_akhir + predikat untuk seluruh siswa pada kelas & mapel terpilih.
+    public function prosesHitungNilaiAkhir(Request $request)
+    {
+        $request->validate([
+            'kode_kelas' => 'required',
+            'kode_mp'    => 'required',
+        ]);
+
+        $tahunAjaran = $this->getTahunAjaranAktif();
+        $siswa = Siswa::where('kode_kelas', $request->kode_kelas)->get();
+        $diproses = 0;
+
+        foreach ($siswa as $s) {
+            $n = Nilai::where('nis', $s->nis)
+                ->where('kode_mp', $request->kode_mp)
+                ->where('tahun_ajaran', $tahunAjaran)
+                ->first();
+
+            if (!$n) continue;
+            if ($n->nilai_harian === null && $n->nilai_uts === null && $n->nilai_uas === null) continue;
+
+            $akhir = $this->hitungNilaiAkhir($n->nilai_harian, $n->nilai_uts, $n->nilai_uas);
+
+            $n->nilai_akhir = $akhir;
+            $n->predikat    = $this->hitungPredikat($akhir);
+            $n->save();
+
+            $diproses++;
+        }
+
+        return response()->json(['success' => true, 'diproses' => $diproses]);
+    }
+
+    // ============================================================
+    //  FITUR KHUSUS WALI KELAS: CEK RAPOR & CETAK RAPOR
+    // ============================================================
+
+    public function cekRapor(Request $request)
+    {
+        $d = $this->pastikanWaliKelas();
+        $tahunAjaran = $this->getTahunAjaranAktif();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $siswa = Siswa::where('kode_kelas', $d->kode_kelas_walas)
+                ->orderBy('nama_siswa')
+                ->get()
+                ->map(function ($s) use ($tahunAjaran) {
+                    $rekap = $this->rekapNilaiSiswa($s->nis, $tahunAjaran);
+                    return [
+                        'nis'                  => $s->nis,
+                        'nama_siswa'           => $s->nama_siswa,
+                        'jumlah_mapel'         => $rekap['jumlah_mapel'],
+                        'jumlah_mapel_dinilai' => $rekap['jumlah_mapel_dinilai'],
+                        'total_nilai_akhir'    => $rekap['total_nilai_akhir'],
+                        'rata_rata'            => $rekap['rata_rata'],
+                        'predikat_rata_rata'   => $rekap['predikat_rata_rata'],
+                    ];
+                });
+
+            return response()->json($siswa);
+        }
+
+        return view('guru.cek-rapor', [
+            'data_guru_aktif' => $d,
+            'nama_kelas'      => $d->nama_kelas_walas,
+        ]);
+    }
+
+    public function detailRapor(Request $request, string $nis)
+    {
+        $d = $this->pastikanWaliKelas();
+        $siswa = Siswa::where('nis', $nis)->where('kode_kelas', $d->kode_kelas_walas)->firstOrFail();
+        $tahunAjaran = $this->getTahunAjaranAktif();
+        $rekap = $this->rekapNilaiSiswa($siswa->nis, $tahunAjaran);
+
+        return response()->json([
+            'nis'        => $siswa->nis,
+            'nama_siswa' => $siswa->nama_siswa,
+        ] + $rekap);
+    }
+
+    public function cetakRapor(Request $request)
+    {
+        $d = $this->pastikanWaliKelas();
+
+        $siswa = Siswa::where('kode_kelas', $d->kode_kelas_walas)
+            ->orderBy('nama_siswa')
+            ->get();
+
+        return view('guru.cetak-rapor', [
+            'data_guru_aktif' => $d,
+            'nama_kelas'      => $d->nama_kelas_walas,
+            'siswa'           => $siswa,
+        ]);
+    }
+
+    public function cetakPdf(Request $request, string $nis)
+    {
+        $d = $this->pastikanWaliKelas();
+
+        $siswa = Siswa::where('nis', $nis)->where('kode_kelas', $d->kode_kelas_walas)->firstOrFail();
+        $tahunAjaran = $this->getTahunAjaranAktif();
+        $rekap = $this->rekapNilaiSiswa($siswa->nis, $tahunAjaran);
+
+        $pdf = Pdf::loadView('guru.cetak-pdf', [
+            'siswa'        => $siswa,
+            'nilai'        => collect($rekap['mapel']),
+            'totalNilai'   => $rekap['total_nilai_akhir'],
+            'rataRata'     => $rekap['rata_rata'],
+            'predikatRata' => $rekap['predikat_rata_rata'],
+            'namaKelas'    => $d->nama_kelas_walas,
+            'tahunAjaran'  => $tahunAjaran,
+            'd'            => $d,
+        ])->setPaper('a4', 'portrait');
+
+        $namaFile = 'Rapor_' . str_replace(' ', '_', $siswa->nama_siswa) . '_' . $siswa->nis . '.pdf';
+
+        return $pdf->stream($namaFile);
     }
 }

@@ -1,91 +1,94 @@
-@extends('layout.guru-app')
-
-@section('title', 'Cetak Rapor Siswa | E-Rapor')
-
-@section('content')
-
-<!-- JUDUL DI TENGAH (LUAR KOTAK) -->
-<div class="text-center mb-6 mt-4">
-    <h6 class="font-bold text-lg text-gray-800 uppercase tracking-wide">
-        Cetak Rapor Siswa
-    </h6>
-</div>
-
-<!-- KOTAK PUTIH UTAMA -->
-<div class="bg-white p-8 rounded-t-3xl shadow-sm border border-gray-100 mt-6 min-h-[calc(100vh-180px)] flex flex-col">
-
-    <!-- FORM FILTER -->
-    <div class="w-full space-y-4 mb-10">
-        <!-- KELAS -->
-        <div class="flex flex-col md:flex-row md:items-center gap-4">
-            <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Kelas</label>
-            <div class="md:w-3/4 relative">
-                <select name="kelas" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm cursor-pointer">
-                    <option value="" selected disabled></option>
-                    <option value="X-MIPA-1">X MIPA 1</option>
-                    <option value="XI-IPS-2">XI IPS 2</option>
-                </select>
-                <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rapor {{ $siswa->nama_siswa }}</title>
+    <style>
+        body { font-family: sans-serif; font-size: 13px; color: #222; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h2 { margin: 0; font-size: 18px; }
+        .header p { margin: 2px 0; font-size: 12px; }
+        .info-table { width: 100%; margin-top: 15px; margin-bottom: 10px; font-size: 12px; }
+        .info-table td { padding: 2px 4px; }
+        table.nilai { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table.nilai th, table.nilai td { border: 1px solid #444; padding: 7px; text-align: center; }
+        table.nilai th { background-color: #f2f2f2; }
+        table.nilai td.mapel { text-align: left; }
+        table.nilai tfoot td { font-weight: bold; background-color: #f7f7f7; }
+        .predikat { font-weight: bold; }
+        .footer-ttd { margin-top: 60px; width: 100%; }
+        .footer-ttd td { text-align: center; vertical-align: top; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Laporan Hasil Belajar (Rapor)</h2>
+        <p>Tahun Ajaran {{ $tahunAjaran }}</p>
     </div>
 
-    <!-- TABEL DATA SISWA -->
-    <div class="overflow-x-auto border rounded-lg shadow-sm">
-        <table class="w-full text-sm text-left border-collapse">
-            <thead class="bg-gray-50 text-gray-700 font-bold border-b text-xs uppercase">
-                <tr>
-                    <th class="px-4 py-3 border-r w-12 text-center">No</th>
-                    <th class="px-4 py-3 border-r">Nama Siswa</th>
-                    <th class="px-4 py-3 border-r text-center w-32">NISN</th>
-                    <th class="px-4 py-3 border-r text-center w-32">NIS</th>
-                    <th class="px-4 py-3 border-r text-center w-32">Lihat Rapor</th>
-                    <th class="px-4 py-3 border-r text-center w-32">Cetak Rapor</th>
-                    <th class="px-4 py-3 text-center w-40">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y text-gray-600">
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-3 border-r text-center">1</td>
-                    <td class="px-4 py-3 border-r uppercase">Nama Siswa Contoh</td>
-                    <td class="px-4 py-3 border-r text-center">008234123</td>
-                    <td class="px-4 py-3 border-r text-center">12345</td>
-                    <td class="px-4 py-3 border-r text-center">
-                        <button class="text-emerald-600 hover:text-emerald-800 font-medium">
-                            <i class="fa-solid fa-eye"></i> Lihat
-                        </button>
-                    </td>
-                    <td class="px-4 py-3 border-r text-center">
-                        <button class="text-red-600 hover:text-red-800 font-medium">
-                            <i class="fa-solid fa-file-pdf"></i> PDF
-                        </button>
-                    </td>
-                    <td class="px-4 py-3">
-                        <div class="flex justify-center gap-6">
-                            <button class="text-blue-600 hover:underline font-semibold">Ubah</button>
-                            <button class="text-red-500 hover:underline font-semibold">Hapus</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table class="info-table">
+        <tr>
+            <td style="width: 12%;">Nama</td>
+            <td style="width: 38%;">: {{ $siswa->nama_siswa }}</td>
+            <td style="width: 12%;">Kelas</td>
+            <td style="width: 38%;">: {{ $namaKelas }}</td>
+        </tr>
+        <tr>
+            <td>NIS</td>
+            <td>: {{ $siswa->nis }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
 
-    <!-- PAGINATION -->
-    <div class="mt-auto pt-10 flex justify-end">
-        <div class="flex border border-gray-300 rounded-md overflow-hidden bg-gray-50 text-[10px] shadow-sm">
-            <button class="px-2.5 py-1 border-r border-gray-300 hover:bg-gray-200 transition text-gray-500 font-bold">
-                <<
-            </button>
-            <div class="px-3.5 py-1 bg-white border-r border-gray-300 text-blue-600 font-bold">
-                1
-            </div>
-            <button class="px-2.5 py-1 hover:bg-gray-200 transition text-gray-500 font-bold">
-                >>
-            </button>
-        </div>
-    </div>
+    <table class="nilai">
+        <thead>
+            <tr>
+                <th style="width: 5%;">No</th>
+                <th style="width: 45%;">Mata Pelajaran</th>
+                <th style="width: 17%;">Nilai Akhir</th>
+                <th style="width: 17%;">Predikat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($nilai as $i => $n)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td class="mapel">{{ $n['nama_mp'] }}</td>
+                <td>{{ $n['nilai_akhir'] ?? '-' }}</td>
+                <td class="predikat">{{ $n['predikat'] }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="4">Belum ada data nilai</td>
+            </tr>
+            @endforelse
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2">Total Nilai Akhir</td>
+                <td colspan="2">{{ $totalNilai }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Rata-rata</td>
+                <td colspan="2">{{ $rataRata }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Predikat Rata-rata</td>
+                <td colspan="2">{{ $predikatRata }}</td>
+            </tr>
+        </tfoot>
+    </table>
 
-</div>
-
-@endsection
+    <table class="footer-ttd">
+        <tr>
+            <td style="width: 50%;"></td>
+            <td style="width: 50%;">
+                <p>Wali Kelas,</p>
+                <br><br><br>
+                <p><strong>{{ $d->nama_guru ?? '...' }}</strong></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

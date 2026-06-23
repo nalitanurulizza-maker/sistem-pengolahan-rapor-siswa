@@ -63,9 +63,9 @@
                 </div>
             </div>
 
-            {{-- Fitur Tambahan Khusus Wali Kelas (Walas) --}}
+            {{-- Fitur Khusus Wali Kelas (Walas): Cek Rapor & Cetak Rapor --}}
             @if(isset($data_guru_aktif) && (strtolower($data_guru_aktif->role ?? '') === 'walas' || strtolower($data_guru_aktif->role ?? '') === 'wali kelas'))
-                <div x-data="{ open: {{ request()->is('guru/input-kehadiran') || request()->is('guru/input-catatan') || request()->is('guru/cetak-*') ? 'true' : 'false' }} }" class="mt-2">
+                <div x-data="{ open: {{ request()->is('guru/cek-rapor') || request()->is('guru/cek-rapor/*') || request()->is('guru/cetak-rapor') || request()->is('guru/cetak-rapor/*') ? 'true' : 'false' }} }" class="mt-2">
                     <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm border-t border-white/5 pt-3">
                         <span class="flex items-center text-amber-300 font-medium">
                             <i class="fa-solid fa-id-card-clip w-5"></i> Wali Kelas
@@ -73,13 +73,10 @@
                         <i class="fa-solid fa-chevron-down text-[10px] text-amber-300 transition-transform" :class="open ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="open" x-cloak class="bg-black/10 pb-2">
-                        <a href="{{ route('guru.input-kehadiran') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.input-kehadiran') ? 'text-blue-300 font-bold' : '' }}">
-                            + Input Kehadiran
+                        <a href="{{ route('guru.cek-rapor') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.cek-rapor') || request()->routeIs('guru.detail-rapor') ? 'text-blue-300 font-bold' : '' }}">
+                            + Cek Rapor
                         </a>
-                        <a href="{{ route('guru.input-catatan') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.input-catatan') ? 'text-blue-300 font-bold' : '' }}">
-                            + Catatan Wali Kelas
-                        </a>
-                        <a href="{{ route('guru.cetak-rapor') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('guru.cetak-rapor') ? 'text-blue-300 font-bold' : '' }}">
+                        <a href="{{ route('guru.cetak-rapor') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->is('guru/cetak-rapor*') ? 'text-blue-300 font-bold' : '' }}">
                             + Cetak Rapor
                         </a>
                     </div>
