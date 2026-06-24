@@ -26,13 +26,12 @@
                     <th class="px-4 py-3 border-r text-center">Mapel Dinilai</th>
                     <th class="px-4 py-3 border-r text-center">Total Nilai Akhir</th>
                     <th class="px-4 py-3 border-r text-center">Rata-rata</th>
-                    <th class="px-4 py-3 border-r text-center">Predikat</th>
                     <th class="px-4 py-3 text-center">Detail</th>
                 </tr>
             </thead>
             <tbody id="tabel-rapor-body" class="divide-y text-gray-600">
                 <tr>
-                    <td colspan="8" class="px-4 py-6 text-center text-gray-400 italic">Memuat data...</td>
+                    <td colspan="7" class="px-4 py-6 text-center text-gray-400 italic">Memuat data...</td>
                 </tr>
             </tbody>
         </table>
@@ -69,7 +68,6 @@
                     <tr class="font-bold bg-gray-50">
                         <td class="px-3 py-2 border-r" colspan="4">Rata-rata</td>
                         <td class="px-3 py-2 border-r text-center" id="modal-rata"></td>
-                        <td class="px-3 py-2 text-center" id="modal-predikat-rata"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -91,7 +89,6 @@
     var modalBody       = document.getElementById('modal-tabel-body');
     var modalTotal       = document.getElementById('modal-total');
     var modalRata         = document.getElementById('modal-rata');
-    var modalPredikatRata = document.getElementById('modal-predikat-rata');
 
     document.getElementById('modal-close').addEventListener('click', function () {
         modal.classList.add('hidden');
@@ -124,12 +121,11 @@
         tbody.innerHTML = '';
 
         if (!data.length) {
-            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-6 text-center text-gray-400 italic">Belum ada siswa di kelas ini.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-gray-400 italic">Belum ada siswa di kelas ini.</td></tr>';
             return;
         }
 
         data.forEach(function (s, i) {
-            var warnaPredikat = badgePredikat(s.predikat_rata_rata);
 
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-gray-50 transition';
@@ -140,7 +136,6 @@
               + '<td class="px-4 py-3 border-r text-center">' + s.jumlah_mapel_dinilai + ' / ' + s.jumlah_mapel + '</td>'
               + '<td class="px-4 py-3 border-r text-center font-semibold">' + s.total_nilai_akhir + '</td>'
               + '<td class="px-4 py-3 border-r text-center font-semibold">' + s.rata_rata + '</td>'
-              + '<td class="px-4 py-3 border-r text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ' + warnaPredikat + '">' + s.predikat_rata_rata + '</span></td>'
               + '<td class="px-4 py-3 text-center"><button data-nis="' + s.nis + '" data-nama="' + esc(s.nama_siswa) + '" class="btn-detail text-blue-600 hover:underline font-semibold text-xs">Lihat Detail</button></td>';
 
             tbody.appendChild(tr);
@@ -181,7 +176,6 @@
             });
             modalTotal.textContent = data.total_nilai_akhir;
             modalRata.textContent = data.rata_rata;
-            modalPredikatRata.innerHTML = '<span class="px-2 py-0.5 rounded-full text-xs font-bold ' + badgePredikat(data.predikat_rata_rata) + '">' + data.predikat_rata_rata + '</span>';
         })
         .catch(function () {
             modalBody.innerHTML = '<tr><td colspan="6" class="px-3 py-4 text-center text-red-400 italic">Gagal memuat detail.</td></tr>';

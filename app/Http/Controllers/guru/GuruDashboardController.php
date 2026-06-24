@@ -141,7 +141,6 @@ class GuruDashboardController extends Controller
             'rata_rata'            => $rataRata,
             'jumlah_mapel'         => count($rekap),
             'jumlah_mapel_dinilai' => $jumlahMapelDinilai,
-            'predikat_rata_rata'   => $this->hitungPredikat($rataRata),
         ];
     }
 
@@ -226,16 +225,41 @@ class GuruDashboardController extends Controller
             $existing = Nilai::where('nis', $nis)->where('kode_mp', $request->kode_mp)->first();
 
             if ($existing) {
-                $existing->$kolom = $val;
-                $existing->save();
+
+            $existing->$kolom = $val;
+
+            $existing->nilai_akhir = $this->hitungNilaiAkhir(
+                $existing->nilai_harian,
+                $existing->nilai_uts,
+                $existing->nilai_uas
+            );
+
+            $existing->predikat = $this->hitungPredikat(
+                $existing->nilai_akhir
+            );
+
+            $existing->save();
+
             } else {
-                Nilai::create([
-                    'kode_nilai'   => 'NL-' . $nis . '-' . $request->kode_mp,
-                    'nis'          => $nis,
-                    'kode_mp'      => $request->kode_mp,
-                    $kolom         => $val,
-                    'tahun_ajaran' => $this->getTahunAjaranAktif()
-                ]);
+            $nilai = Nilai::create([
+                'kode_nilai'   => 'NL-' . $nis . '-' . $request->kode_mp,
+                'nis'          => $nis,
+                'kode_mp'      => $request->kode_mp,
+                $kolom         => $val,
+                'tahun_ajaran' => $this->getTahunAjaranAktif()
+            ]);
+
+            $nilai->nilai_akhir = $this->hitungNilaiAkhir(
+                $nilai->nilai_harian,
+                $nilai->nilai_uts,
+                $nilai->nilai_uas
+            );
+
+            $nilai->predikat = $this->hitungPredikat(
+                $nilai->nilai_akhir
+            );
+
+            $nilai->save();
             }
         }
 
@@ -378,7 +402,6 @@ class GuruDashboardController extends Controller
                         'jumlah_mapel_dinilai' => $rekap['jumlah_mapel_dinilai'],
                         'total_nilai_akhir'    => $rekap['total_nilai_akhir'],
                         'rata_rata'            => $rekap['rata_rata'],
-                        'predikat_rata_rata'   => $rekap['predikat_rata_rata'],
                     ];
                 });
 
@@ -432,7 +455,6 @@ class GuruDashboardController extends Controller
             'nilai'        => collect($rekap['mapel']),
             'totalNilai'   => $rekap['total_nilai_akhir'],
             'rataRata'     => $rekap['rata_rata'],
-            'predikatRata' => $rekap['predikat_rata_rata'],
             'namaKelas'    => $d->nama_kelas_walas,
             'tahunAjaran'  => $tahunAjaran,
             'd'            => $d,

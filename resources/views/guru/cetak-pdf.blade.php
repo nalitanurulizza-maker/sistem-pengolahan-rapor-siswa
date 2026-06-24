@@ -73,10 +73,6 @@
                 <td colspan="2">Rata-rata</td>
                 <td colspan="2">{{ $rataRata }}</td>
             </tr>
-            <tr>
-                <td colspan="2">Predikat Rata-rata</td>
-                <td colspan="2">{{ $predikatRata }}</td>
-            </tr>
         </tfoot>
     </table>
 
