@@ -92,9 +92,9 @@
                     @endforelse
                 </tbody>
             </table>
+    </div>
             <div class="mt-4 px-3">{{ $data_siswa->links() }}</div>
         </div>
-    </div>
 
     <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>

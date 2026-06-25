@@ -114,13 +114,10 @@
                     @endforelse
                 </tbody>
             </table>
-           
-            @if(method_exists($data_mapel, 'links'))
-                <div class="mt-4 px-2">
-                    {{ $data_mapel->appends(['search' => request('search')])->links() }}
-                </div>
-            @endif
         </div>
+            <div class="mt-4 px-3">
+                {{ $data_mapel->links() }}
+            </div>
     </div>
 
     {{-- Modal Tambah --}}

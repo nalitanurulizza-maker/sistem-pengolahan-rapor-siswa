@@ -22,6 +22,9 @@
             <form method="GET" action="{{ url()->current() }}">
                 <select name="kelas" onchange="this.form.submit()" class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl px-3 py-2 w-full sm:w-44 shadow-sm focus:outline-none">
                     <option value="">Semua Kelas</option>
+                    @foreach($list_kelas as $k)
+                        <option value="{{ $k->id }}" {{ request('kelas') == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                    @endforeach
                 </select>
             </form>
         </div>
@@ -31,6 +34,7 @@
         </button>
     </div>
 
+    {{-- KOTAK PUTIH UTAMA TABEL --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sm:p-4 w-full">
         <table class="w-full table-fixed text-sm">
             <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
@@ -46,7 +50,9 @@
             <tbody class="text-gray-700 divide-y divide-gray-50">
                 @forelse($daftar_pengampu as $index => $data)
                     <tr class="hover:bg-gray-50/70 transition">
-                        <td class="p-3 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
+                        <td class="p-3 text-center font-medium text-gray-500">
+                            {{ $daftar_pengampu->firstItem() + $index }}
+                        </td>
                         <td class="p-3">
                             <span class="block font-semibold text-gray-900 truncate">{{ $data->guru->nama_guru ?? 'Guru tidak ditemukan' }}</span>
                             <span class="block text-xs font-mono text-gray-400">{{ $data->guru_id }}</span>
@@ -75,6 +81,11 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- PAGINATION (SEKARANG SUDAH BERADA DI LUAR KOTAK PUTIH TABEL) --}}
+    <div class="mt-4 px-2">
+        {{ $daftar_pengampu->links() }}
     </div>
 
     <div x-show="openTambah" class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex justify-center items-center" x-cloak>

@@ -15,18 +15,24 @@ class GuruPengampu extends Model
     // Relasi ke tabel guru (NIP string)
     public function guru()
     {
-        return $this->belongsTo(Guru::class, 'guru_id', 'nip');
+        return $this->belongsTo(Guru::class, 'guru_id', 'nip')->withDefault([
+            'nama_guru' => 'Guru Tidak Ditemukan / Terhapus'
+        ]);
     }
 
     // Relasi ke tabel mapel (Kode MP string)
     public function mapel()
     {
-        return $this->belongsTo(Mapel::class, 'kode_mp', 'kode_mp');
+        return $this->belongsTo(Mapel::class, 'kode_mp', 'kode_mp')->withDefault([
+            'nama_mp' => 'Mapel Tidak Ditemukan / Terhapus'
+        ]);
     }
 
     // Relasi ke tabel kelas (ID bigint)
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
+        return $this->belongsTo(Kelas::class, 'kelas_id', 'id')->withDefault([
+            'nama_kelas' => 'Kelas Tidak Ditemukan'
+        ]);
     }
 }

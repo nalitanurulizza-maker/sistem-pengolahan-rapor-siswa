@@ -94,11 +94,10 @@
                     @endforelse
                 </tbody>
             </table>
-
-            <div class="mt-4 px-2">
+        </div>
+                <div class="mt-4 px-2">
                 {{ $kelas->links() }}
             </div>
-        </div>
     </div>
 
     {{-- MODAL TAMBAH DATA --}}

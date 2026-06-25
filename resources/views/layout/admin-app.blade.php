@@ -62,6 +62,9 @@
         <a href="{{ route('admin.mata-pelajaran') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.mata-pelajaran') ? 'text-blue-300 font-bold' : '' }}">
             + Mata Pelajaran
         </a>
+        <a href="{{ route('admin.paket-mapel') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.paket-mapel') ? 'text-blue-300 font-bold' : '' }}">
+            + Paket Mapel
+        </a>
         <a href="{{ route('admin.guru-pengampu.index') }}" class="block py-2 pl-10 pr-4 hover:text-blue-300 transition text-xs {{ request()->routeIs('admin.guru-pengampu.index') ? 'text-blue-300 font-bold' : '' }}">
             + Guru Pengampu
         </a>

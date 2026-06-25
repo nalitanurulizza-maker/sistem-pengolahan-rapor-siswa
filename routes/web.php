@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\MapelController;
 use App\Http\Controllers\Admin\TahunAkademikController;
 use App\Http\Controllers\Admin\GuruPengampuController;
+use App\Http\Controllers\Admin\PaketMapelController;
 
 // CONTROLLER GURU
 use App\Http\Controllers\Guru\GuruDashboardController;
@@ -75,6 +76,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/mata-pelajaran/{kode_mp}', [MapelController::class, 'update'])->name('mata-pelajaran.update');
         Route::delete('/mata-pelajaran/{kode_mp}', [MapelController::class, 'destroy'])->name('mata-pelajaran.destroy');
 
+       // PAKET MATA PELAJARAN 
+        Route::get   ('/paket-mapel',             [PaketMapelController::class, 'index'])   ->name('paket-mapel');
+        Route::get   ('/paket-mapel-index',       [PaketMapelController::class, 'index'])   ->name('paket-mapel.index');
+        Route::get   ('/paket-mapel/create',      [PaketMapelController::class, 'create'])  ->name('paket-mapel.create');
+        Route::post  ('/paket-mapel',             [PaketMapelController::class, 'store'])   ->name('paket-mapel.store');
+        Route::get   ('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'show'])    ->name('paket-mapel.show');
+        Route::delete('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'destroy']) ->name('paket-mapel.destroy');
+        
         // TAHUN AKADEMIK
         Route::get('/tahun-akademik', [TahunAkademikController::class, 'index'])->name('tahun-akademik');
         Route::post('/tahun-akademik', [TahunAkademikController::class, 'store'])->name('tahun-akademik.store');

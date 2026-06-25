@@ -11,17 +11,24 @@ use Illuminate\Http\Request;
 
 class GuruPengampuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // 1. Ambil data utama untuk tabel
-        $daftar_pengampu = GuruPengampu::with(['guru', 'mapel', 'kelas'])->latest()->get();
+        // 1. Mulai query dasar dengan eager loading relasi
+        $query = GuruPengampu::with(['guru', 'mapel', 'kelas'])->latest();
+
+        if ($request->has('kelas') && $request->kelas != '') {
+            $query->where('kelas_id', $request->kelas);
+        }
+
+        // 3. Ambil data dengan pagination (10 data per halaman)
+        $daftar_pengampu = $query->paginate(10)->appends($request->all());
         
-        // 2. Ambil data master untuk pilihan dropdown di dalam modal tambah
+        // 4. Ambil data master untuk pilihan dropdown di dalam modal tambah & filter kelas
         $list_guru = Guru::all();
         $list_mapel = Mapel::all();
         $list_kelas = Kelas::all();
         
-        // 3. Kirim semuanya ke view tunggal guru-pengampu
+        // 5. Kirim semuanya ke view tunggal guru-pengampu
         return view('admin.guru-pengampu', compact('daftar_pengampu', 'list_guru', 'list_mapel', 'list_kelas'));
     }
 
