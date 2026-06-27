@@ -5,61 +5,59 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin\Kelas;
-use App\Models\Admin\Mapel;
 use App\Models\Admin\Guru;
 use App\Models\Admin\TahunAkademik;
 
 class GuruPengampuSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Ambil Tahun Akademik yang aktif saat ini
         $tahunAktif = TahunAkademik::where('status', 'Aktif')->first();
-        $namaTahun = $tahunAktif ? $tahunAktif->nama_tahun : '2025/2026';
+        $namaTahun = $tahunAktif ? $tahunAktif->nama_tahun : '2026/2027';
 
-        // 2. Ambil semua data kelas
         $kelasList = Kelas::all();
-
-        // 3. Ambil semua kode mapel yang valid di database
-        $mapelList = Mapel::pluck('kode_mp')->toArray();
-
-        // 4. Ambil semua NIP dari tabel guru
         $guruNips = Guru::pluck('nip')->toArray();
 
         if (empty($guruNips)) {
-            $this->command->warn('Tidak ada data di tabel guru. Silakan isi data guru terlebih dahulu!');
-            return;
-        }
-
-        if (empty($mapelList)) {
-            $this->command->warn('Tidak ada data di tabel mata_pelajaran. Silakan isi data mata pelajaran terlebih dahulu!');
+            $this->command->warn('Data guru kosong!');
             return;
         }
 
         $dataToInsert = [];
 
-        // Looping menjodohkan setiap kelas dengan setiap mata pelajaran secara otomatis
         foreach ($kelasList as $kelas) {
+            // 🟢 MENYAMBUNGKAN KE PAKET MAPEL KELAS
+            $paket = DB::table('paket_mapel')
+                ->where('kode_kelas', $kelas->kode_kelas)
+                ->first();
+
+            if (!$paket) {
+                continue;
+            }
+
+            // 🟢 HANYA MENGAMBIL MAPEL YANG TERDAFTAR DI PAKET KELAS TERSEBUT
+            $mapelList = DB::table('paket_mapel_detail')
+                ->where('paket_id', $paket->id)
+                ->pluck('kode_mp')
+                ->toArray();
+
             foreach ($mapelList as $kodeMp) {
-                // Pilih NIP guru secara acak
                 $randomGuruNip = $guruNips[array_rand($guruNips)];
 
-                // Cek apakah kombinasi plot ini sudah ada di database untuk menghindari duplicate entry
-                $exists = DB::table('guru_pengampu')
+                // Proteksi super ketat agar 1 mapel di 1 kelas hanya diampu 1 guru (Mencegah Duplikat)
+                $existsInArray = collect($dataToInsert)->where('kelas_id', $kelas->id)->where('kode_mp', $kodeMp)->first();
+                $existsInDb = DB::table('guru_pengampu')
                     ->where('kelas_id', $kelas->id)
                     ->where('kode_mp', $kodeMp)
                     ->where('tahun_akademik', $namaTahun)
                     ->exists();
 
-                if (!$exists) {
+                if (!$existsInArray && !$existsInDb) {
                     $dataToInsert[] = [
-                        'guru_id'        => $randomGuruNip, // diisi dengan NIP sesuai relasi belongsTo
+                        'guru_id'        => $randomGuruNip,
                         'kelas_id'       => $kelas->id,
                         'kode_mp'        => $kodeMp,
-                        'tahun_akademik' => $namaTahun, // disesuaikan dengan fillable model
+                        'tahun_akademik' => $namaTahun,
                         'created_at'     => now(),
                         'updated_at'     => now(),
                     ];
@@ -67,12 +65,9 @@ class GuruPengampuSeeder extends Seeder
             }
         }
 
-        // Jalankan bulk insert data dalam jumlah besar sekaligus
         if (!empty($dataToInsert)) {
             DB::table('guru_pengampu')->insert($dataToInsert);
-            $this->command->info('Berhasil menambahkan ' . count($dataToInsert) . ' data Guru Pengampu otomatis.');
-        } else {
-            $this->command->info('Semua kombinasi kelas dan mapel sudah ter-plot.');
+            $this->command->info('Berhasil menambahkan ' . count($dataToInsert) . ' plot guru pengampu sesuai paket mapel.');
         }
     }
 }

@@ -38,13 +38,13 @@
             <table class="w-full table-fixed text-sm">
                 <thead class="bg-gray-50 text-gray-600 border-b border-gray-100">
                     <tr>
-                        <th class="p-3 text-center w-[6%]">No</th>
-                        <th class="p-3 text-left w-[26%]">Siswa (NIS)</th>
-                        <th class="p-3 text-center w-[12%]">L/P</th>
-                        <th class="p-3 text-left w-[15%] lg:table-cell hidden">Tgl Lahir</th>
-                        <th class="p-3 text-left w-[20%] md:table-cell hidden">Alamat</th>
-                        <th class="p-3 text-left w-[23%] sm:table-cell hidden">Wali Murid</th>
-                        <th class="p-3 text-center w-[10%]">Kelas</th>
+                        <th class="p-3 text-center w-[5%]">No</th>
+                        <th class="p-3 text-left w-[25%]">Siswa (NIS / NISN)</th>
+                        <th class="p-3 text-center w-[10%]">L/P</th>
+                        <th class="p-3 text-left w-[13%] lg:table-cell hidden">Tgl Lahir</th>
+                        <th class="p-3 text-left w-[18%] md:table-cell hidden">Alamat</th>
+                        <th class="p-3 text-left w-[18%] sm:table-cell hidden">Wali Murid</th>
+                        <th class="p-3 text-center w-[8%]">Kelas</th>
                         <th class="p-3 text-center w-[8%]">Aksi</th>
                     </tr>
                 </thead>
@@ -54,7 +54,11 @@
                             <td class="p-3 text-center">{{ $data_siswa->firstItem() + $key }}</td>
                             <td class="p-3">
                                 <span class="block font-semibold text-gray-900 truncate">{{ $siswa->nama_siswa }}</span>
-                                <span class="block text-xs font-mono text-blue-600">{{ $siswa->nis }}</span>
+                                <span class="block text-xs font-mono text-blue-600">NIS: {{ $siswa->nis }}</span>
+                                {{-- NISN ditampilkan jika ada --}}
+                                @if($siswa->nisn)
+                                    <span class="block text-xs font-mono text-gray-400">NISN: {{ $siswa->nisn }}</span>
+                                @endif
                             </td>
                             <td class="p-3 text-center">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                             <td class="p-3 lg:table-cell hidden text-gray-600">{{ $siswa->tgl_lahir }}</td>
@@ -92,10 +96,11 @@
                     @endforelse
                 </tbody>
             </table>
-    </div>
-            <div class="mt-4 px-3">{{ $data_siswa->links() }}</div>
         </div>
+        <div class="mt-4 px-3">{{ $data_siswa->links() }}</div>
+    </div>
 
+    {{-- MODAL TAMBAH --}}
     <div x-show="openTambah" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         <div class="fixed inset-0 bg-black/50" @click="openTambah = false"></div>
         <div class="flex min-h-full items-center justify-center p-4">
@@ -105,16 +110,30 @@
                 <form action="{{ route('admin.siswa.store') }}" method="POST" class="space-y-4">
                     @csrf
 
+                    {{-- NIS + NISN --}}
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">NIS</label>
-                            <input type="text" name="nis" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <input type="text" name="nis" required
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Siswa</label>
-                            <input type="text" name="nama_siswa" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <label class="block text-sm font-medium text-gray-700">
+                                NISN
+                                <span class="text-xs text-gray-400 font-normal">(opsional)</span>
+                            </label>
+                            <input type="text" name="nisn" maxlength="20"
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                   placeholder="10 digit NISN">
                         </div>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nama Siswa</label>
+                        <input type="text" name="nama_siswa" required
+                               class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
@@ -126,13 +145,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                            <input type="date" name="tgl_lahir" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <input type="date" name="tgl_lahir" required
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">No. Telepon Siswa</label>
-                            <input type="text" name="no_telp" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <input type="text" name="no_telp"
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Kelas</label>
@@ -144,32 +166,41 @@
                             </select>
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                        <textarea name="alamat" rows="2" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm"></textarea>
+                        <textarea name="alamat" rows="2" required
+                                  class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm"></textarea>
                     </div>
+
                     <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
                         <span class="block text-sm font-bold text-gray-800">Data Wali Murid</span>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600">Nama Wali</label>
-                                <input type="text" name="nama_wali" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                                <input type="text" name="nama_wali"
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600">No. Telp Wali</label>
-                                <input type="text" name="no_telp_wali" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                                <input type="text" name="no_telp_wali"
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                             </div>
                         </div>
                     </div>
+
                     <div class="mt-8 flex justify-end gap-3">
-                        <button @click="openTambah = false" type="button" class="px-5 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg">Batal</button>
-                        <button type="submit" class="px-5 py-2 text-sm text-white bg-blue-600 rounded-lg shadow-md font-semibold">Simpan</button>
+                        <button @click="openTambah = false" type="button"
+                                class="px-5 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg">Batal</button>
+                        <button type="submit"
+                                class="px-5 py-2 text-sm text-white bg-blue-600 rounded-lg shadow-md font-semibold">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    {{-- MODAL EDIT --}}
     @if($siswa_edit)
     <div x-show="openEdit" x-transition.opacity class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
         <div class="fixed inset-0 bg-black/50" @click="window.location.href='{{ route('admin.data-siswa', request()->except('edit_nis')) }}'"></div>
@@ -179,16 +210,33 @@
                 
                 <form action="{{ route('admin.siswa.update', $siswa_edit->nis) }}" method="POST" class="space-y-4">
                     @csrf
-                    @method('PUT') <div class="grid grid-cols-2 gap-4">
+                    @method('PUT')
+
+                    {{-- NIS (disabled) + NISN (editable) --}}
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">NIS</label>
-                            <input type="text" value="{{ $siswa_edit->nis }}" disabled class="mt-1 block w-full rounded-lg border border-gray-200 bg-gray-50 p-2 text-sm font-mono">
+                            <input type="text" value="{{ $siswa_edit->nis }}" disabled
+                                   class="mt-1 block w-full rounded-lg border border-gray-200 bg-gray-50 p-2 text-sm font-mono">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Siswa</label>
-                            <input type="text" name="nama_siswa" value="{{ $siswa_edit->nama_siswa }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <label class="block text-sm font-medium text-gray-700">
+                                NISN
+                                <span class="text-xs text-gray-400 font-normal">(opsional)</span>
+                            </label>
+                            <input type="text" name="nisn" maxlength="20"
+                                   value="{{ $siswa_edit->nisn }}"
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                   placeholder="10 digit NISN">
                         </div>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nama Siswa</label>
+                        <input type="text" name="nama_siswa" value="{{ $siswa_edit->nama_siswa }}" required
+                               class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
@@ -199,13 +247,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                            <input type="date" name="tgl_lahir" value="{{ $siswa_edit->tgl_lahir }}" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <input type="date" name="tgl_lahir" value="{{ $siswa_edit->tgl_lahir }}" required
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">No. Telepon Siswa</label>
-                            <input type="text" name="no_telp" value="{{ $siswa_edit->no_telp_siswa }}" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                            <input type="text" name="no_telp" value="{{ $siswa_edit->no_telp_siswa }}"
+                                   class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Kelas</label>
@@ -218,26 +269,35 @@
                             </select>
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                        <textarea name="alamat" rows="2" required class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">{{ $siswa_edit->alamat }}</textarea>
+                        <textarea name="alamat" rows="2" required
+                                  class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">{{ $siswa_edit->alamat }}</textarea>
                     </div>
+
                     <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
                         <span class="block text-sm font-bold text-gray-800">Data Wali Murid</span>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600">Nama Wali</label>
-                                <input type="text" name="nama_wali" value="{{ $siswa_edit->wali_murid }}" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                                <input type="text" name="nama_wali" value="{{ $siswa_edit->wali_murid }}"
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600">No. Telp Wali</label>
-                                <input type="text" name="no_telp_wali" value="{{ $siswa_edit->no_telp_wali }}" class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
+                                <input type="text" name="no_telp_wali" value="{{ $siswa_edit->no_telp_wali }}"
+                                       class="mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm">
                             </div>
                         </div>
                     </div>
+
                     <div class="mt-8 flex justify-end gap-3">
-                        <button type="button" @click="window.location.href='{{ route('admin.data-siswa', request()->except('edit_nis')) }}'" class="px-5 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg">Batal</button>
-                        <button type="submit" class="px-5 py-2 text-sm text-white bg-blue-600 rounded-lg shadow-md font-semibold">Perbarui</button>
+                        <button type="button"
+                                @click="window.location.href='{{ route('admin.data-siswa', request()->except('edit_nis')) }}'"
+                                class="px-5 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg">Batal</button>
+                        <button type="submit"
+                                class="px-5 py-2 text-sm text-white bg-blue-600 rounded-lg shadow-md font-semibold">Perbarui</button>
                     </div>
                 </form>
             </div>

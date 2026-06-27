@@ -21,7 +21,6 @@ class SiswaController extends Controller
 
         $data_siswa = $query->paginate(10)->withQueryString();
 
-        // Mengambil data satu siswa jika tombol edit diklik
         $siswa_edit = null;
         if ($request->has('edit_nis')) {
             $siswa_edit = Siswa::where('nis', $request->edit_nis)->first();
@@ -35,6 +34,7 @@ class SiswaController extends Controller
     {
         $request->validate([
             'nis'           => 'required|unique:siswa,nis',
+            'nisn'          => 'nullable|digits:10|unique:siswa,nisn', // ← tambah
             'nama_siswa'    => 'required',
             'jenis_kelamin' => 'required',
             'tgl_lahir'     => 'required|date',
@@ -44,6 +44,7 @@ class SiswaController extends Controller
 
         Siswa::create([
             'nis'           => $request->nis,
+            'nisn'          => $request->nisn,  // ← tambah
             'nama_siswa'    => $request->nama_siswa,
             'jenis_kelamin' => $request->jenis_kelamin,
             'tgl_lahir'     => $request->tgl_lahir,
@@ -61,6 +62,7 @@ class SiswaController extends Controller
     public function update(Request $request, $nis)
     {
         $request->validate([
+            'nisn'          => 'nullable|digits:10|unique:siswa,nisn,' . $nis . ',nis', // ← tambah
             'nama_siswa'    => 'required',
             'jenis_kelamin' => 'required',
             'tgl_lahir'     => 'required|date',
@@ -69,6 +71,7 @@ class SiswaController extends Controller
         ]);
 
         Siswa::where('nis', $nis)->update([
+            'nisn'          => $request->nisn,  // ← tambah
             'nama_siswa'    => $request->nama_siswa,
             'jenis_kelamin' => $request->jenis_kelamin,
             'tgl_lahir'     => $request->tgl_lahir,
