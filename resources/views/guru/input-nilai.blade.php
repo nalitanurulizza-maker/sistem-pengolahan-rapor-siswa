@@ -32,10 +32,9 @@
             <label class="md:w-1/4 font-semibold text-gray-700 text-sm">Pilih Mata Pelajaran</label>
             <div class="md:w-3/4 relative">
                 <select id="select-mapel" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
-                    <option value="" disabled selected>-- Pilih Mata Pelajaran --</option>
-                    @foreach($mata_pelajaran as $mp)
-                        <option value="{{ $mp->kode_mp }}">{{ $mp->nama_mp }}</option>
-                    @endforeach
+                    <option value="" disabled selected>
+                        -- Pilih Mata Pelajaran --
+                    </option>
                 </select>
                 <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
             </div>
@@ -147,18 +146,66 @@
 (function () {
     'use strict';
 
-    var dataSiswa  = [];
-    var fetchUrl   = '{{ route("guru.input-nilai") }}';
-    var csrfToken  = '{{ csrf_token() }}';
+    var dataSiswa = [];
+    var fetchUrl = "{{ route('guru.input-nilai') }}";
+    var getMapelUrl = "{{ route('guru.get-mapel') }}";
+    var csrfToken = "{{ csrf_token() }}";
 
-    var selKelas   = document.getElementById('select-kelas');
-    var selMapel   = document.getElementById('select-mapel');
-    var selJenis   = document.getElementById('select-jenis');
+    var selKelas = document.getElementById('select-kelas');
+    var selMapel = document.getElementById('select-mapel');
+    var selJenis = document.getElementById('select-jenis');
+
     var wrapTombol = document.getElementById('wrapper-tombol-input');
-    var btnMassal  = document.getElementById('btn-input-massal');
-    var overlay    = document.getElementById('overlay-modal');
-    var formNilai  = document.getElementById('form-nilai');
+    var btnMassal = document.getElementById('btn-input-massal');
+    var overlay = document.getElementById('overlay-modal');
+    var formNilai = document.getElementById('form-nilai');
     var modalTitle = document.getElementById('modal-main-title');
+
+
+    // ===================================
+    // LOAD MAPEL BERDASARKAN KELAS
+    // ===================================
+    selKelas.addEventListener('change', function () {
+
+        selMapel.innerHTML =
+            '<option value="">Loading...</option>';
+
+        wrapTombol.style.display = 'none';
+
+        fetch(getMapelUrl + '?kode_kelas=' + this.value, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("Gagal mengambil data mapel");
+            }
+            return response.json();
+        })
+        .then(function (data) {
+
+            var html =
+                '<option value="">-- Pilih Mata Pelajaran --</option>';
+
+            data.forEach(function (mp) {
+                html +=
+                    '<option value="' + mp.kode_mp + '">' +
+                    mp.nama_mp +
+                    '</option>';
+            });
+
+            selMapel.innerHTML = html;
+
+        })
+        .catch(function (err) {
+            console.log(err);
+
+            selMapel.innerHTML =
+                '<option value="">Mapel tidak ditemukan</option>';
+        });
+
+    });
 
     window.addEventListener('DOMContentLoaded', function () {
         var urlParams  = new URLSearchParams(window.location.search);

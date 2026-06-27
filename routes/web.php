@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:guru,wali kelas'])
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard-guru');
 
         // NILAI
+        Route::get('/get-mapel', [GuruDashboardController::class, 'getMapelByKelas'])->name('get-mapel');
         Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('cek-nilai');
         Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
         Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');

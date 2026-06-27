@@ -32,9 +32,6 @@
             <div class="md:w-3/4 relative">
                 <select id="select-mapel" class="w-full appearance-none bg-gray-100 border border-transparent rounded-xl px-4 py-3 pr-10 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all text-sm">
                     <option value="" disabled selected>-- Pilih Mata Pelajaran --</option>
-                    @foreach($mata_pelajaran as $mp)
-                        <option value="{{ $mp->kode_mp }}">{{ $mp->nama_mp }}</option>
-                    @endforeach
                 </select>
                 <i class="fa-solid fa-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
             </div>
@@ -93,12 +90,33 @@
     'use strict';
 
     var dataSiswa    = [];
-    var fetchUrl     = '{{ route("guru.cek-nilai") }}'; 
+    var fetchUrl     = '{{ route("guru.cek-nilai") }}';
+    var getMapelUrl  = '{{ route("guru.get-mapel") }}'; // ← tambah ini
 
     var selKelas     = document.getElementById('select-kelas');
     var selMapel     = document.getElementById('select-mapel');
     var selJenis     = document.getElementById('select-jenis');
     var tbody        = document.getElementById('tabel-siswa-body');
+
+    // ── LOAD MAPEL SAAT KELAS BERUBAH ──
+    selKelas.addEventListener('change', function () {
+        selMapel.innerHTML = '<option value="">Loading...</option>';
+
+        fetch(getMapelUrl + '?kode_kelas=' + this.value, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            var html = '<option value="" disabled selected>-- Pilih Mata Pelajaran --</option>';
+            data.forEach(function (mp) {
+                html += '<option value="' + mp.kode_mp + '">' + mp.nama_mp + '</option>';
+            });
+            selMapel.innerHTML = html;
+        })
+        .catch(function () {
+            selMapel.innerHTML = '<option value="">Mapel tidak ditemukan</option>';
+        });
+    });
 
     // Jalankan pencarian otomatis saat ada perubahan di filter dropdown
     [selKelas, selMapel, selJenis].forEach(function (el) {

@@ -11,10 +11,6 @@ class Kelas extends Model
 
     protected $table = 'kelas';
     
-    protected $primaryKey = 'kode_kelas'; 
-    public $incrementing = false;
-    protected $keyType = 'string';
-    
     public $timestamps = false;
 
     protected $fillable = [

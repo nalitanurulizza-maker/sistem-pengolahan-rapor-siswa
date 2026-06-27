@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Admin\Siswa;
 use App\Models\Admin\TahunAkademik;
 use App\Models\Admin\GuruPengampu;
+use App\Models\Admin\Kelas;
 use App\Models\Guru\Nilai;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -94,54 +95,109 @@ class GuruDashboardController extends Controller
      * lengkap dengan nilai akhir & predikat per mapel, total, dan rata-rata.
      */
     private function rekapNilaiSiswa(string $nis, string $tahunAjaran): array
+
     {
-        $mapel = DB::table('mata_pelajaran')->orderBy('nama_mp')->get();
+
+        // Cari kelas siswa
+
+        $siswa = DB::table('siswa')->where('nis', $nis)->first();
+
+        // Ambil mapel dari paket kelas siswa
+
+        $paket = \App\Models\Admin\PaketMapel::where('kode_kelas', $siswa?->kode_kelas)
+
+            ->where('tahun_ajaran', $tahunAjaran)
+
+            ->with(['details.mataPelajaran'])
+
+            ->first();
+
+        // Fallback ke semua mapel jika paket belum diatur
+
+        $mapel = $paket
+
+            ? $paket->details->map(fn($d) => $d->mataPelajaran)->filter()->sortBy('nama_mp')
+
+            : collect(DB::table('mata_pelajaran')->orderBy('nama_mp')->get());
 
         $nilaiPerMapel = Nilai::where('nis', $nis)
+
             ->where('tahun_ajaran', $tahunAjaran)
+
             ->get()
+
             ->keyBy('kode_mp');
 
         $rekap = [];
+
         $totalNilaiAkhir = 0;
+
         $jumlahMapelDinilai = 0;
 
         foreach ($mapel as $mp) {
+
             $n = $nilaiPerMapel->get($mp->kode_mp);
 
             $harian = $n->nilai_harian ?? null;
-            $uts    = $n->nilai_uts ?? null;
-            $uas    = $n->nilai_uas ?? null;
 
-            $adaNilai = $harian !== null || $uts !== null || $uas !== null;
+            $uts    = $n->nilai_uts    ?? null;
+
+            $uas    = $n->nilai_uas    ?? null;
+
+            $adaNilai   = $harian !== null || $uts !== null || $uas !== null;
+
             $nilaiAkhir = $adaNilai ? $this->hitungNilaiAkhir($harian, $uts, $uas) : null;
-            $predikat = $nilaiAkhir !== null ? $this->hitungPredikat($nilaiAkhir) : '-';
+
+            $predikat   = $nilaiAkhir !== null ? $this->hitungPredikat($nilaiAkhir) : '-';
 
             if ($nilaiAkhir !== null) {
+
                 $totalNilaiAkhir += $nilaiAkhir;
+
                 $jumlahMapelDinilai++;
+
             }
 
             $rekap[] = [
+
                 'kode_mp'      => $mp->kode_mp,
+
                 'nama_mp'      => $mp->nama_mp,
+
                 'nilai_harian' => $harian,
+
                 'nilai_uts'    => $uts,
+
                 'nilai_uas'    => $uas,
+
                 'nilai_akhir'  => $nilaiAkhir,
+
                 'predikat'     => $predikat,
+
             ];
+
         }
 
-        $rataRata = $jumlahMapelDinilai > 0 ? round($totalNilaiAkhir / $jumlahMapelDinilai, 2) : 0;
+        $rataRata = $jumlahMapelDinilai > 0
+
+            ? round($totalNilaiAkhir / $jumlahMapelDinilai, 2)
+
+            : 0;
 
         return [
+
             'mapel'                => $rekap,
+
             'total_nilai_akhir'    => round($totalNilaiAkhir, 2),
+
             'rata_rata'            => $rataRata,
+
             'jumlah_mapel'         => count($rekap),
+
             'jumlah_mapel_dinilai' => $jumlahMapelDinilai,
+
         ];
+
     }
 
     // --- DASHBOARD ---
@@ -202,10 +258,33 @@ class GuruDashboardController extends Controller
                 ->get();
 
         return view('guru.input-nilai', [
-            'kelas'          => $plot->pluck('kelas')->unique('kode_kelas'),
-            'mata_pelajaran' => $plot->pluck('mapel')->unique('kode_mp'),
-            'd'              => $d
+            'kelas'           => $plot->pluck('kelas')->unique('kode_kelas'),
+            'mata_pelajaran'   => $plot->pluck('mapel')->unique('kode_mp'),
+            'data_guru_aktif' => $d
         ]);
+    }
+
+    public function getMapelByKelas(Request $request)
+    {
+        $guru = $this->getGuruAktif();
+
+        // Cari data kelas berdasarkan kode_kelas
+        $kelas = Kelas::where('kode_kelas', $request->kode_kelas)->first();
+
+        if (!$kelas) {
+            return response()->json([]);
+        }
+
+        // Ambil mapel yang diampu guru pada kelas tersebut
+        $mapel = GuruPengampu::with('mapel')
+            ->where('guru_id', $guru->nip)
+            ->where('kelas_id', $kelas->id)
+            ->get()
+            ->pluck('mapel')
+            ->unique('kode_mp')
+            ->values();
+
+        return response()->json($mapel);
     }
 
     public function simpanNilaiBatch(Request $request)
