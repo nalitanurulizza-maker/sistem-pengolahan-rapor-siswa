@@ -26,7 +26,6 @@ class PaketMapelController extends Controller
             ->get()
             ->keyBy('kode_kelas');
 
-        // MENYESUAIKAN: menggunakan .paket-mapel.index sesuai folder fisik di VS Code
         return view('admin.paket-mapel.index', compact('kelasList', 'paketExisting', 'tahunAktif'));
     }
 
@@ -50,6 +49,15 @@ class PaketMapelController extends Controller
             ? $paketAda->detailPilihan()->pluck('kode_mp')->toArray()
             : [];
 
+        // Kelas X → semua MIPA+IPS otomatis terpilih
+        $isKelas10 = str_starts_with(strtoupper($kodeKelas), 'X.')
+                  && !str_starts_with(strtoupper($kodeKelas), 'XI')
+                  && !str_starts_with(strtoupper($kodeKelas), 'XII');
+
+        if ($isKelas10 && empty($terpilihPilihan)) {
+            $terpilihPilihan = Mapel::kodePilihan();
+        }
+
         $mapelWajib = Mapel::whereIn('kode_mp', Mapel::kodeWajib())
             ->orderBy('kode_mp')->get();
 
@@ -59,9 +67,8 @@ class PaketMapelController extends Controller
         $mapelIPS = Mapel::whereIn('kode_mp', Mapel::kodeIPS())
             ->orderBy('kode_mp')->get();
 
-        // MENYESUAIKAN: menggunakan .paket-mapel.create sesuai folder fisik di VS Code
         return view('admin.paket-mapel.create', compact(
-            'kelas', 'tahunAktif', 'paketAda',
+            'kelas', 'tahunAktif', 'paketAda', 'isKelas10',
             'mapelWajib', 'mapelMIPA', 'mapelIPS',
             'terpilihWajib', 'terpilihPilihan'
         ));
@@ -69,20 +76,25 @@ class PaketMapelController extends Controller
 
     public function store(Request $request)
     {
-        // 🟢 Deteksi apakah kelas yang diinput merupakan tingkat 10 (X)
-        $isKelas10 = str_contains($request->kode_kelas, '10') || str_contains($request->kode_kelas, 'X');
+        // Deteksi kelas X (X.1, X.2, dst) — bukan XI atau XII
+        $isKelas10 = str_starts_with(strtoupper($request->kode_kelas), 'X.')
+                  && !str_starts_with(strtoupper($request->kode_kelas), 'XI')
+                  && !str_starts_with(strtoupper($request->kode_kelas), 'XII');
 
-        // 🟢 Validasi dinamis sesuai tingkatan kelas
         $request->validate([
             'kode_kelas'      => 'required|exists:kelas,kode_kelas',
             'tahun_ajaran'    => 'required|string',
-            // Jika kelas 10, tidak dibatasi min:4|max:5 karena semua mapel pilihan otomatis diambil
-            'mapel_pilihan'   => $isKelas10 ? 'required|array' : 'required|array|min:4|max:5',
+            // Kelas X: semua mapel pilihan otomatis → tidak dibatasi min/max
+            // Kelas XI/XII: siswa pilih 4–5 mapel peminatan
+            'mapel_pilihan'   => $isKelas10
+                                    ? 'required|array'
+                                    : 'required|array|min:4|max:5',
             'mapel_pilihan.*' => 'exists:mata_pelajaran,kode_mp',
         ], [
+            'kode_kelas.required'    => 'Kelas wajib dipilih.',
             'mapel_pilihan.required' => 'Mata pelajaran pilihan wajib disertakan.',
-            'mapel_pilihan.min'      => 'Minimal pilih 4 mata pelajaran pilihan untuk kelas 11/12.',
-            'mapel_pilihan.max'      => 'Maksimal pilih 5 mata pelajaran pilihan untuk kelas 11/12.',
+            'mapel_pilihan.min'      => 'Minimal pilih 4 mata pelajaran peminatan (kelas XI/XII).',
+            'mapel_pilihan.max'      => 'Maksimal 5 mata pelajaran peminatan (kelas XI/XII).',
         ]);
 
         $kodeKelas  = $request->kode_kelas;
@@ -95,10 +107,12 @@ class PaketMapelController extends Controller
                 ['nama_paket' => "Paket {$kodeKelas} - {$tahun}"]
             );
 
+            // Hapus detail lama sebelum insert ulang
             $paket->details()->delete();
 
             $urutan = 1;
 
+            // Insert mapel wajib
             foreach ($mapelWajib as $kode) {
                 PaketMapelDetail::create([
                     'paket_id' => $paket->id,
@@ -108,6 +122,7 @@ class PaketMapelController extends Controller
                 ]);
             }
 
+            // Insert mapel pilihan
             foreach ($request->mapel_pilihan as $kode) {
                 PaketMapelDetail::create([
                     'paket_id' => $paket->id,
@@ -132,7 +147,6 @@ class PaketMapelController extends Controller
             ->with(['details.mataPelajaran'])
             ->firstOrFail();
 
-        // MENYESUAIKAN: menggunakan .paket-mapel.show sesuai folder fisik di VS Code
         return view('admin.paket-mapel.show', compact('paket', 'tahunAktif'));
     }
 

@@ -9,65 +9,57 @@ class Mapel extends Model
 {
     use HasFactory;
 
-    // 🟢 SINKRONISASI DENGAN DATABASE ASLI (image_4dbec7.jpg)
-    protected $table = 'mata_pelajaran'; 
-    protected $primaryKey = 'kode_mp'; 
-    
-    public $incrementing = false;
-    protected $keyType = 'string';
-    public $timestamps = false;
+    protected $table      = 'mata_pelajaran';
+    protected $primaryKey = 'kode_mp';
+    public $incrementing  = false;
+    protected $keyType    = 'string';
+    public $timestamps    = false;
 
-    /**
-     * Kolom yang diizinkan untuk diisi secara massal (Mass Assignment)
-     */
-    protected $fillable = [
-        'kode_mp',   // Sesuai kolom database phpMyAdmin
-        'nama_mp',   // Sesuai kolom database phpMyAdmin
-    ];
+    protected $fillable = ['kode_mp', 'nama_mp'];
 
-    // =========================================================================
-    // ➕ TAMBAHAN FUNGSI static UNTUK PENGELOMPOKAN MAPEL (TIDAK MENGUBAH KODE LAMA)
-    // =========================================================================
-
-    /**
-     * Mengembalikan daftar kode mata pelajaran WAJIB (Umum)
-     * Silakan sesuaikan isi string kode_mp di bawah dengan yang ada di database kamu
-     */
-    public static function kodeWajib()
+    // ─── MAPEL WAJIB (MP001–MP009) ──────────────────────────────────────────
+    public static function kodeWajib(): array
     {
         return [
-            'MP001', // Contoh: Pendidikan Agama
-            'MP002', // Contoh: PPKn
-            'MP003', // Contoh: Bahasa Indonesia
-            'MP004', // Contoh: Matematika (Umum)
-            'MP005', // Contoh: Sejarah Indonesia
-            'MP006', // Contoh: Bahasa Inggris
+            'MP001', // Matematika (Umum)
+            'MP002', // Bahasa Indonesia
+            'MP003', // Bahasa Inggris
+            'MP004', // Pendidikan Pancasila (PPKn)
+            'MP005', // Pendidikan Agama dan Budi Pekerti
+            'MP006', // Penjasorkes (PJOK)
+            'MP007', // Sejarah Indonesia
+            'MP008', // Seni Budaya
+            'MP009', // Prakarya dan Kewirausahaan
         ];
     }
 
-    /**
-     * Mengembalikan daftar kode mata pelajaran rumpun MIPA (Pilihan)
-     */
-    public static function kodeMIPA()
+    // ─── PEMINATAN IPA (MP010–MP014) ────────────────────────────────────────
+    public static function kodeMIPA(): array
     {
         return [
-            'MP010', // Contoh: Biologi
-            'MP011', // Contoh: Fisika
-            'MP012', // Contoh: Kimia
-            'MP013', // Contoh: Informatika
+            'MP010', // Fisika
+            'MP011', // Kimia
+            'MP012', // Biologi
+            'MP013', // Matematika Peminatan
+            'MP014', // Informatika
         ];
     }
 
-    /**
-     * Mengembalikan daftar kode mata pelajaran rumpun IPS (Pilihan)
-     */
-    public static function kodeIPS()
+    // ─── PEMINATAN IPS (MP015–MP019) ────────────────────────────────────────
+    public static function kodeIPS(): array
     {
         return [
-            'MP014', // Contoh: Geografi
-            'MP015', // Contoh: Sosiologi
-            'MP016', // Contoh: Ekonomi
-            'MP017', // Contoh: Sejarah Peminatan
+            'MP015', // Sosiologi
+            'MP016', // Geografi
+            'MP017', // Ekonomi
+            'MP018', // Sejarah Peminatan
+            'MP019', // Antropologi
         ];
+    }
+
+    // ─── SEMUA MAPEL PILIHAN (MIPA + IPS) ───────────────────────────────────
+    public static function kodePilihan(): array
+    {
+        return array_merge(static::kodeMIPA(), static::kodeIPS());
     }
 }
