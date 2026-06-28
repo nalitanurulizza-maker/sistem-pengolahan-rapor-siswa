@@ -39,11 +39,4 @@ public function nilai()
 {
     return $this->hasMany(\App\Models\Guru\Nilai::class, 'nis', 'nis');
 }
-
-
-public function absensi()
-{
-    return $this->hasOne(\App\Models\Guru\Absensi::class, 'nis', 'nis')
-                ->where('tahun_ajaran', '2026/2027');
-}
 }

@@ -76,14 +76,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/mata-pelajaran/{kode_mp}', [MapelController::class, 'update'])->name('mata-pelajaran.update');
         Route::delete('/mata-pelajaran/{kode_mp}', [MapelController::class, 'destroy'])->name('mata-pelajaran.destroy');
 
-       // PAKET MATA PELAJARAN 
-        Route::get   ('/paket-mapel',             [PaketMapelController::class, 'index'])   ->name('paket-mapel');
-        Route::get   ('/paket-mapel-index',       [PaketMapelController::class, 'index'])   ->name('paket-mapel.index');
-        Route::get   ('/paket-mapel/create',      [PaketMapelController::class, 'create'])  ->name('paket-mapel.create');
-        Route::post  ('/paket-mapel',             [PaketMapelController::class, 'store'])   ->name('paket-mapel.store');
-        Route::get   ('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'show'])    ->name('paket-mapel.show');
-        Route::delete('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'destroy']) ->name('paket-mapel.destroy');
-        
+        // PAKET MATA PELAJARAN
+        Route::get('/paket-mapel',             [PaketMapelController::class, 'index'])   ->name('paket-mapel');
+        Route::get('/paket-mapel-index',       [PaketMapelController::class, 'index'])   ->name('paket-mapel.index');
+        Route::get('/paket-mapel/create',      [PaketMapelController::class, 'create'])  ->name('paket-mapel.create');
+        Route::post('/paket-mapel',            [PaketMapelController::class, 'store'])   ->name('paket-mapel.store');
+        Route::get('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'show'])    ->name('paket-mapel.show');
+        Route::delete('/paket-mapel/{kodeKelas}', [PaketMapelController::class, 'destroy'])->name('paket-mapel.destroy');
+
         // TAHUN AKADEMIK
         Route::get('/tahun-akademik', [TahunAkademikController::class, 'index'])->name('tahun-akademik');
         Route::post('/tahun-akademik', [TahunAkademikController::class, 'store'])->name('tahun-akademik.store');
@@ -106,25 +106,30 @@ Route::middleware(['auth', 'role:guru,wali kelas'])
     ->name('guru.')
     ->group(function () {
 
+        // DASHBOARD
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard-guru');
 
-        // NILAI
-        Route::get('/get-mapel', [GuruDashboardController::class, 'getMapelByKelas'])->name('get-mapel');
-        Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('cek-nilai');
-        Route::get('/input-nilai', [GuruDashboardController::class, 'inputNilai'])->name('input-nilai');
-        Route::post('/simpan-nilai-batch', [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');
+        // INPUT NILAI
+        Route::get('/input-nilai',          [GuruDashboardController::class, 'inputNilai'])      ->name('input-nilai');
+        Route::get('/get-mapel',            [GuruDashboardController::class, 'getMapelByKelas']) ->name('get-mapel');
+        Route::post('/simpan-nilai-batch',  [GuruDashboardController::class, 'simpanNilaiBatch'])->name('simpan-nilai-batch');
+        Route::post('/edit-nilai',          [GuruDashboardController::class, 'editNilai'])       ->name('edit-nilai');
+        Route::post('/hapus-nilai',         [GuruDashboardController::class, 'hapusNilai'])      ->name('hapus-nilai');
 
-        // RAPOR (guru mata pelajaran)
-        Route::get('/rapor', [GuruDashboardController::class, 'rapor'])->name('rapor');
+        // CEK NILAI
+        Route::get('/cek-nilai', [GuruDashboardController::class, 'cekNilai'])->name('cek-nilai');
 
         // HITUNG NILAI AKHIR
         Route::post('/hitung-nilai-akhir', [GuruDashboardController::class, 'prosesHitungNilaiAkhir'])->name('hitung-nilai-akhir');
 
-        // KHUSUS WALI KELAS
-        Route::get('/cek-rapor', [GuruDashboardController::class, 'cekRapor'])->name('cek-rapor');
-        Route::get('/cek-rapor/{nis}', [GuruDashboardController::class, 'detailRapor'])->name('detail-rapor');
+        // RAPOR (guru mata pelajaran)
+        Route::get('/rapor', [GuruDashboardController::class, 'rapor'])->name('rapor');
 
-        // CETAK RAPOR
-        Route::get('/cetak-rapor', [GuruDashboardController::class, 'cetakRapor'])->name('cetak-rapor');
-        Route::get('/cetak-rapor/pdf/{nis}', [GuruDashboardController::class, 'cetakPdf'])->name('cetak-pdf');
+        // KHUSUS WALI KELAS
+        // Catatan: route /cetak-rapor/pdf/{nis} harus SEBELUM /cetak-rapor
+        // agar Laravel tidak salah resolve {nis} sebagai segment 'pdf'
+        Route::get('/cetak-rapor/pdf/{nis}', [GuruDashboardController::class, 'cetakPdf'])   ->name('cetak-pdf');
+        Route::get('/cetak-rapor',           [GuruDashboardController::class, 'cetakRapor']) ->name('cetak-rapor');
+        Route::get('/cek-rapor/{nis}',       [GuruDashboardController::class, 'detailRapor'])->name('detail-rapor');
+        Route::get('/cek-rapor',             [GuruDashboardController::class, 'cekRapor'])   ->name('cek-rapor');
     });

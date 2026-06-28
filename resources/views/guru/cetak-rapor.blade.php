@@ -8,7 +8,7 @@
     <h6 class="font-bold text-lg text-gray-800 uppercase tracking-wide">
         Cetak Rapor — Kelas {{ $nama_kelas }}
     </h6>
-    <p class="text-xs text-gray-500 mt-1">Pilih siswa untuk mencetak rapor dalam bentuk PDF.</p>
+    <p class="text-xs text-gray-500 mt-1">Pilih siswa yang akan dicetak rapornya dalam format PDF.</p>
 </div>
 
 <div class="bg-white p-8 rounded-t-3xl shadow-sm border border-gray-100 mt-6 min-h-[calc(100vh-180px)] flex flex-col">
