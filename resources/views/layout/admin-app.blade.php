@@ -51,7 +51,7 @@
             </div>
 
             {{-- Awal Kelompok Akademik --}}
-<div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/tahun-*') || request()->is('admin/guru-pengampu*') ? 'true' : 'false' }} }">
+<div x-data="{ open: {{ request()->is('admin/mata-*') || request()->is('admin/paket-*') || request()->is('admin/tahun-*') || request()->is('admin/guru-pengampu*') ? 'true' : 'false' }} }">
     <button @click="open = !open" class="w-full flex items-center justify-between py-3 px-4 hover:bg-white/10 transition text-sm">
         <span class="flex items-center">
             <i class="fa-solid fa-graduation-cap w-5"></i> Akademik
